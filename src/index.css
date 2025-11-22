@@ -1,0 +1,120 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  font-family: "Poppins", serif;
+  font-weight: 400;
+}
+
+/* ant design modal footer top margin remove */
+.ant-modal-footer {
+  margin-top: 0 !important;
+}
+/* 
+
+
+/* ant design menu option */
+.ant-menu-light .ant-menu-item {
+  color: black !important;
+}
+.ant-menu-light .ant-menu-submenu-title {
+  color: black !important;
+}
+.ant-menu-item:hover {
+  background: #3f51b5 !important;
+  color: white !important;
+  border-radius: 20px 60px 60px 20px !important;
+}
+
+.ant-menu-item,
+.ant-menu-submenu-title {
+  transition: none !important;
+  overflow: hidden; /* ensure hover background respects border radius */
+}
+
+.ant-menu-item:hover::after,
+.ant-menu-item-selected::after {
+  border-radius: 0 60px 60px 0 !important;
+}
+
+.ant-menu-item-selected {
+  background: #3f51b5 !important;
+  border-radius: 20px 60px 60px 20px !important;
+  color: white !important;
+  width: "100%" !important;
+}
+
+.ant-menu-light .ant-menu-item-selected,
+.ant-menu-light .ant-menu-item-selected a,
+.ant-menu-light .ant-menu-item-selected .ant-menu-title-content {
+  color: white !important;
+}
+
+.ant-menu-light .ant-menu-submenu-selected > .ant-menu-submenu-title {
+  color: white !important;
+}
+
+.ant-menu .ant-menu-item .ant-menu-item-icon + span {
+  transition: none !important;
+}
+
+.ant-menu-light .ant-menu-submenu-selected > .ant-menu-submenu-title {
+  color: black !important;
+}
+
+.ant-menu .ant-menu-title-content {
+  transition: none !important;
+}
+
+.ant-badge .ant-badge-count {
+  background: #3f51b5 !important;
+  color: white !important;
+  border: 1px solid #3f51b5 !important;
+}
+
+.ant-btn:hover,
+.ant-btn:focus {
+  background-color: #1e2f8b !important;
+  border-color: white !important;
+  color: white !important;
+  box-shadow: none !important;
+}
+
+.jodit-workplace {
+  height: 550px !important;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #dfdfdf00;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  /* background: #8b0000;  */
+  background: #ffffff67;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #3f51b5;
+}
+
+/* pagination style */
+.ant-pagination-item-active a {
+  color: white !important;
+  background-color: #3f51b5 !important;
+}
+
+.ant-switch-checked {
+  background-color: #3f51b5 !important;
+}
