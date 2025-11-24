@@ -66,8 +66,9 @@ const Login = () => {
   return (
     <div>
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-semibold mb-6">Login</h1>
-        <p>Please enter your email and password to continue</p>
+        <p className="text-white text-sm">
+          Please enter your email and password to continue
+        </p>
       </div>
       <Form
         onFinish={onFinish}

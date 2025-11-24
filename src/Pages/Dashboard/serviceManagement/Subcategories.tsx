@@ -1,5 +1,16 @@
 import { useMemo, useState } from "react";
-import { Table, Button, Modal, Form, Space, Tag, ConfigProvider } from "antd";
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Space,
+  Tag,
+  ConfigProvider,
+  Input,
+  Select,
+  InputNumber,
+} from "antd";
 import type { TableProps } from "antd";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { FaPlus } from "react-icons/fa6";
@@ -163,11 +174,79 @@ const Subcategories = () => {
         onCancel={() => setOpen(false)}
         onOk={onSubmit}
         okText={editingId ? "Save" : "Create"}
+        width={900}
       >
-        <div>
-          <h1>hello</h1>
-          <p>hukka hua</p>
-        </div>
+        <Form
+          form={form}
+          layout="vertical"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
+          <div className="p-4 border rounded-lg space-y-4">
+            <Form.Item name="title" label="Title" rules={[{ required: true }]}>
+              <Input placeholder="Enter title" />
+            </Form.Item>
+            <Form.Item
+              name="categoryId"
+              label="Category"
+              rules={[{ required: true }]}
+            >
+              <Select
+                placeholder="Select category"
+                options={categories.map((c) => ({
+                  label: c.title,
+                  value: c.id,
+                }))}
+              />
+            </Form.Item>
+            <Form.Item
+              name="costPerUnit"
+              label="Cost per unit (m2)"
+              rules={[{ required: true }]}
+            >
+              <InputNumber
+                min={0}
+                style={{ width: "100%" }}
+                placeholder="Enter cost"
+              />
+            </Form.Item>
+          </div>
+          <div className="p-4 border rounded-lg">
+            <Form.List name="elements" initialValue={["Ceiling", "Wall"]}>
+              {(fields, { add, remove }) => (
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="font-medium">Elements needing work</span>
+                    <Button
+                      type="dashed"
+                      onClick={() => add()}
+                      icon={<FaPlus />}
+                    >
+                      Add element
+                    </Button>
+                  </div>
+                  {fields.map((field) => (
+                    <div key={field.key} className="flex items-center gap-2">
+                      <Form.Item
+                        name={field.name}
+                        rules={[{ required: true }]}
+                        className="flex-1"
+                      >
+                        <Input placeholder="e.g., Ceiling, Wall" />
+                      </Form.Item>
+                      <Button
+                        danger
+                        type="text"
+                        icon={<FiTrash2 />}
+                        onClick={() => remove(field.name)}
+                        className="mb-5"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Form.List>
+          </div>
+        </Form>
       </Modal>
     </div>
   );

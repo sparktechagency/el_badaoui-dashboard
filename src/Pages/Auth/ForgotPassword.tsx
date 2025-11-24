@@ -38,9 +38,9 @@ const ForgotPassword = () => {
 
   return (
     <div>
-      <div className="text-center mb-8">
+      <div className="text-center mb-8 text-white">
         <h1 className="text-[25px] font-semibold mb-6">Forgot Password</h1>
-        <p className="w-[90%] mx-auto text-base">
+        <p className="w-[90%] mx-auto text-white">
           Enter your email below to reset your password
         </p>
       </div>

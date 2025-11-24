@@ -1,42 +1,37 @@
 import { Outlet } from "react-router-dom";
-import backgroundImage from "../../assets/salonGoLoginBg.png";
+import leftImage from "../../assets/LoginPageLeftSideImage.png";
+import rightBg from "../../assets/loginPageRightSideBg.png";
+import logo from "../../assets/loginLogo.png";
 
 const Auth = () => {
   return (
-    <div
-      className="w-full flex items-center justify-center relative"
-      style={{
-        height: "100vh",
-      }}
-    >
-      <div
-        style={{
-          backgroundImage: `url('${backgroundImage}')`,
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-          opacity: 0.2,
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          zIndex: 1,
-        }}
-      ></div>
-
-      <div
-        style={{
-          background: "#ffffff",
-          padding: 30,
-          borderRadius: 10,
-          width: 510,
-          position: "relative",
-          zIndex: 2,
-        }}
-        className="shadow-xl"
-      >
-        <Outlet />
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+      <div className="flex items-center justify-center bg-white p-6">
+        <img
+          src={leftImage}
+          alt="illustration"
+          className="max-w-[520px] w-full h-auto"
+        />
+      </div>
+      <div className="relative">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `url('${rightBg}')`,
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+          }}
+        />
+        <div className="absolute inset-0 bg-black/40" />
+        <div className="relative z-10 h-full flex items-center justify-center p-6">
+          <div className="w-full max-w-md rounded-2xl border border-white/30 bg-white/20 backdrop-blur-md shadow-2xl p-6">
+            <div className="flex flex-col items-center gap-2 mb-6">
+              <img src={logo} alt="logo" className="h-40" />
+            </div>
+            <Outlet />
+          </div>
+        </div>
       </div>
     </div>
   );
