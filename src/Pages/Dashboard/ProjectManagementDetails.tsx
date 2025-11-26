@@ -128,17 +128,17 @@ const ProjectManagementDetails = () => {
           <h1 className="text-2xl font-bold text-[#210630]">
             {details.projectCode}
           </h1>
-          <div className="mt-2">
+          {/* <div className="mt-2">
             <Tag color={statusColor[details.status as Status]} style={{ color: "#fff" }}>
               {details.status}
             </Tag>
-          </div>
+          </div> */}
         </div>
         <div className="flex items-center gap-3">
-          <Button type="default" onClick={openStatusModal}>
+          <Button  type="default" onClick={openStatusModal} className="py-[22px]">
             Update Status
           </Button>
-          <Button type="default" onClick={openVatModal}>
+          <Button type="default" onClick={openVatModal} className="py-[22px]">
             Update Values
           </Button>
 
@@ -146,12 +146,13 @@ const ProjectManagementDetails = () => {
           {/* <Button type="primary">Send Message</Button> */}
 
             <Button 
-            type="primary"
+            type="default"
             onClick={() => {
               if (details?.email) {
                 window.location.href = `mailto:${details.email}?subject=Regarding Project ${details.projectCode}`;
               }
             }}
+            className="py-[22px]"
           >
             Send Message
           </Button>
