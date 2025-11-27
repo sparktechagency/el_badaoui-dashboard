@@ -21,8 +21,8 @@ const userSlice = api.injectEndpoints({
       query: ({id, status}) => {
         return {
           method: "PATCH",
-          url: "/user",
-          body: {id, status},
+          url: `/admin/users/${id}/status`,
+          body: { status }, // Only send status in body, id is in URL
         };
       },
     }),
@@ -30,7 +30,7 @@ const userSlice = api.injectEndpoints({
       query: (data) => {
         return {
           method: "POST",
-          url: "/admin/artisan",
+          url: "/user",
           body: data,
         };
       },
@@ -43,6 +43,14 @@ const userSlice = api.injectEndpoints({
         };
       },
     }),
+    deleteUser: builder.mutation({
+      query: (id) => {
+        return {
+          method: "DELETE",
+          url: `/admin/users/${id}`,
+        };
+      },
+    }),
   }),
 });
 
@@ -51,4 +59,5 @@ export const {
   useUserStatusUpdateMutation,
   useCreateArtisansMutation,
   useUserByIdQuery,
+  useDeleteUserMutation,
 } = userSlice;

@@ -1,8 +1,8 @@
 import { Tabs, Table, ConfigProvider, Button, Tag, Modal, Descriptions, Input, Form, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { EyeOutlined, LockOutlined, PlusOutlined, EditOutlined, SearchOutlined } from "@ant-design/icons";
+import { EyeOutlined, LockOutlined, PlusOutlined, EditOutlined, SearchOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
-import { useGetAllUsersQuery, useUserStatusUpdateMutation, useCreateArtisansMutation, useUserByIdQuery } from "@/redux/apiSlices/userSlice";
+import { useGetAllUsersQuery, useUserStatusUpdateMutation, useCreateArtisansMutation, useDeleteUserMutation } from "@/redux/apiSlices/userSlice";
 import { useSearchParams } from "react-router-dom";
 
 type UserRow = {
@@ -25,6 +25,7 @@ const Users = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [viewOpen, setViewOpen] = useState(false);
   const [blockOpen, setBlockOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [artisanModalOpen, setArtisanModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [selected, setSelected] = useState<UserRow | null>(null);
@@ -33,16 +34,15 @@ const Users = () => {
 
   // Get URL params
   const currentPage = parseInt(searchParams.get("page") || "1");
-  const perPage = parseInt(searchParams.get("2") || "2");
+  const perPage = parseInt(searchParams.get("limit") || "10");
   const activeTab = searchParams.get("role") || "USER";
   const search = searchParams.get("searchTerm") || "";
 
   // Build query params
   const queryParams = [
-    { name: "role", value: activeTab },
     { name: "page", value: currentPage.toString() },
     { name: "limit", value: perPage.toString() },
-    
+    { name: "role", value: activeTab },
   ];
 
   if (search) {
@@ -52,10 +52,20 @@ const Users = () => {
   const { data: users, isLoading, refetch } = useGetAllUsersQuery(queryParams);
   const [userStatusUpdate] = useUserStatusUpdateMutation();
   const [createArtisan] = useCreateArtisansMutation();
+  const [deleteUser] = useDeleteUserMutation();
 
   useEffect(() => {
     setSearchTerm(search);
   }, [search]);
+
+  useEffect(() => {
+    if (searchTerm !== search) {
+      const timer = setTimeout(() => {
+        handleSearch(searchTerm);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [searchTerm]);
 
   const handleTabChange = (key: string) => {
     setSearchParams({
@@ -108,8 +118,26 @@ const Users = () => {
       refetch();
       setBlockOpen(false);
       setSelected(null);
-    } catch (error) {
-      message.error("Failed to update user status");
+    } catch (error: any) {
+      message.error(error?.data?.message || "Failed to update user status");
+    }
+  };
+
+  const handleDelete = (record: UserRow) => {
+    setSelected(record);
+    setDeleteOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selected) return;
+    try {
+      await deleteUser(selected._id).unwrap();
+      message.success("User deleted successfully");
+      refetch();
+      setDeleteOpen(false);
+      setSelected(null);
+    } catch (error: any) {
+      message.error(error?.data?.message || "Failed to delete user");
     }
   };
 
@@ -168,6 +196,12 @@ const Users = () => {
             onClick={() => handleBlock(record)}
             style={{ color: record.status === "ACTIVE" ? "#f43f5e" : "#14b8a6" }}
           />
+          <Button 
+            type="link" 
+            danger
+            icon={<DeleteOutlined />} 
+            onClick={() => handleDelete(record)}
+          />
         </div>
       ),
     },
@@ -195,6 +229,12 @@ const Users = () => {
             onClick={() => handleBlock(record)}
             style={{ color: record.status === "ACTIVE" ? "#f43f5e" : "#14b8a6" }}
           />
+          <Button 
+            type="link" 
+            danger
+            icon={<DeleteOutlined />} 
+            onClick={() => handleDelete(record)}
+          />
         </div>
       ),
     },
@@ -218,30 +258,18 @@ const Users = () => {
         <Tabs
           activeKey={activeTab}
           onChange={handleTabChange}
-          tabBarExtraContent={
-            activeTab === "ARTISAN" && (
-              <Button 
-                type="primary" 
-                icon={<PlusOutlined />} 
-                onClick={handleAddArtisan}
-              >
-                Add New Artisan
-              </Button>
-            )
-          }
           items={[
             {
               key: "USER",
               label: "Clients",
               children: (
                 <div>
-                  <div className="mb-4">
-                    <Input.Search
+                  <div className="mb-4 flex justify-between items-center">
+                    <Input
                       placeholder="Search clients..."
                       allowClear
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      onSearch={handleSearch}
                       style={{ width: 300 }}
                       prefix={<SearchOutlined />}
                     />
@@ -268,13 +296,19 @@ const Users = () => {
               label: "Artisans",
               children: (
                 <div>
-                  <div className="mb-4">
-                    <Input.Search
+                  <div className="mb-4 flex justify-between items-center">
+                    <Button 
+                      type="primary" 
+                      icon={<PlusOutlined />} 
+                      onClick={handleAddArtisan}
+                    >
+                      Add New Artisan
+                    </Button>
+                    <Input
                       placeholder="Search artisans..."
                       allowClear
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      onSearch={handleSearch}
                       style={{ width: 300 }}
                       prefix={<SearchOutlined />}
                     />
@@ -337,6 +371,21 @@ const Users = () => {
         }}
       >
         Are you sure you want to {selected?.status === "ACTIVE" ? "block" : "activate"} this user?
+      </Modal>
+
+      {/* Delete User Modal */}
+      <Modal
+        title="Delete User"
+        open={deleteOpen}
+        onOk={confirmDelete}
+        okText="Yes, Delete"
+        okButtonProps={{ danger: true }}
+        onCancel={() => {
+          setDeleteOpen(false);
+          setSelected(null);
+        }}
+      >
+        Are you sure you want to delete this user? This action cannot be undone.
       </Modal>
 
       {/* Add/Edit Artisan Modal */}
