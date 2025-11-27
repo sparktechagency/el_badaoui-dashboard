@@ -2,7 +2,7 @@ import { Tabs, Table, ConfigProvider, Button, Tag, Modal, Descriptions, Input, F
 import type { ColumnsType } from "antd/es/table";
 import { EyeOutlined, LockOutlined, PlusOutlined, EditOutlined, SearchOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
-import { useGetAllUsersQuery, useUserStatusUpdateMutation, useCreateArtisansMutation, useDeleteUserMutation } from "@/redux/apiSlices/userSlice";
+import { useGetAllUsersQuery, useUserStatusUpdateMutation, useCreateArtisansMutation, useUpdateArtisanInfoMutation, useDeleteUserMutation } from "@/redux/apiSlices/userSlice";
 import { useSearchParams } from "react-router-dom";
 
 type UserRow = {
@@ -16,7 +16,7 @@ type UserRow = {
 };
 
 const statusTag = (s: "ACTIVE" | "INACTIVE") => (
-  <Tag color={s === "ACTIVE" ? "#14b8a6" : "#f43f5e"} style={{ color: "#fff" }}>
+  <Tag color={s === "ACTIVE" ? "#14b8a6" : "#f43f5e"} style={{ color: "#fff" }} className="w-20 text-center py-1 rounded-md">
     {s}
   </Tag>
 );
@@ -52,6 +52,7 @@ const Users = () => {
   const { data: users, isLoading, refetch } = useGetAllUsersQuery(queryParams);
   const [userStatusUpdate] = useUserStatusUpdateMutation();
   const [createArtisan] = useCreateArtisansMutation();
+  const [updateArtisanInfo] = useUpdateArtisanInfoMutation();
   const [deleteUser] = useDeleteUserMutation();
 
   useEffect(() => {
@@ -162,7 +163,10 @@ const Users = () => {
   const handleArtisanSubmit = async (values: any) => {
     try {
       if (editMode && selected) {
-        // Update artisan logic would go here if you have an update endpoint
+        await updateArtisanInfo({ 
+          id: selected._id, 
+          ...values 
+        }).unwrap();
         message.success("Artisan updated successfully");
       } else {
         await createArtisan(values).unwrap();
@@ -170,6 +174,7 @@ const Users = () => {
       }
       setArtisanModalOpen(false);
       form.resetFields();
+      setSelected(null);
       refetch();
     } catch (error: any) {
       message.error(error?.data?.message || "Failed to save artisan");
@@ -221,16 +226,18 @@ const Users = () => {
       key: "action",
       render: (_, record) => (
         <div className="flex items-center gap-2">
-          <Button type="link" icon={<EyeOutlined />} onClick={() => handleView(record)} />
-          <Button type="link" icon={<EditOutlined />} onClick={() => handleEditArtisan(record)} />
+          <Button type="link" size="middle" icon={<EyeOutlined />} onClick={() => handleView(record)} />
+          <Button type="link" size="middle" icon={<EditOutlined />} onClick={() => handleEditArtisan(record)} />
           <Button 
             type="link" 
+            size="middle"
             icon={<LockOutlined />} 
             onClick={() => handleBlock(record)}
             style={{ color: record.status === "ACTIVE" ? "#f43f5e" : "#14b8a6" }}
           />
           <Button 
             type="link" 
+            size="middle"
             danger
             icon={<DeleteOutlined />} 
             onClick={() => handleDelete(record)}
@@ -246,6 +253,56 @@ const Users = () => {
         <h1 className="text-2xl font-semibold">Users</h1>
       </div>
 
+      <div className="flex justify-between items-center mb-4">
+        <ConfigProvider
+          theme={{
+            components: {
+              Tabs: {
+                inkBarColor: "#ff6b35",
+                itemSelectedColor: "#ff6b35",
+                itemHoverColor: "#ff6b35",
+              },
+            },
+          }}
+        >
+          <Tabs
+            activeKey={activeTab}
+            onChange={handleTabChange}
+            items={[
+              {
+                key: "USER",
+                label: "Clients",
+              },
+              {
+                key: "ARTISAN",
+                label: "Artisans",
+              },
+            ]}
+          />
+        </ConfigProvider>
+
+        <div className="flex items-center gap-3">
+          {activeTab === "ARTISAN" && (
+            <Button 
+              type="default" 
+              icon={<PlusOutlined />} 
+              onClick={handleAddArtisan}
+              className="bg-[#3f51b5] text-white px-4 py-[22px] rounded-md transparent"
+            >
+              Add New Artisan
+            </Button>
+          )}
+          <Input
+            placeholder={activeTab === "USER" ? "Search clients..." : "Search artisans..."}
+            allowClear
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ width: 300 , height: 44 }}
+            prefix={<SearchOutlined />}
+          />
+        </div>
+      </div>
+
       <ConfigProvider
         theme={{
           components: {
@@ -255,82 +312,19 @@ const Users = () => {
           },
         }}
       >
-        <Tabs
-          activeKey={activeTab}
-          onChange={handleTabChange}
-          items={[
-            {
-              key: "USER",
-              label: "Clients",
-              children: (
-                <div>
-                  <div className="mb-4 flex justify-between items-center">
-                    <Input
-                      placeholder="Search clients..."
-                      allowClear
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      style={{ width: 300 }}
-                      prefix={<SearchOutlined />}
-                    />
-                  </div>
-                  <Table<UserRow>
-                    rowKey="_id"
-                    columns={userColumns}
-                    dataSource={users?.data || []}
-                    loading={isLoading}
-                    pagination={{
-                      current: currentPage,
-                      pageSize: perPage,
-                      total: users?.pagination?.total || 0,
-                      onChange: handlePageChange,
-                      showSizeChanger: true,
-                      showTotal: (total) => `Total ${total} clients`,
-                    }}
-                  />
-                </div>
-              ),
-            },
-            {
-              key: "ARTISAN",
-              label: "Artisans",
-              children: (
-                <div>
-                  <div className="mb-4 flex justify-between items-center">
-                    <Button 
-                      type="primary" 
-                      icon={<PlusOutlined />} 
-                      onClick={handleAddArtisan}
-                    >
-                      Add New Artisan
-                    </Button>
-                    <Input
-                      placeholder="Search artisans..."
-                      allowClear
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      style={{ width: 300 }}
-                      prefix={<SearchOutlined />}
-                    />
-                  </div>
-                  <Table<UserRow>
-                    rowKey="_id"
-                    columns={artisanColumns}
-                    dataSource={users?.data || []}
-                    loading={isLoading}
-                    pagination={{
-                      current: currentPage,
-                      pageSize: perPage,
-                      total: users?.pagination?.total || 0,
-                      onChange: handlePageChange,
-                      showSizeChanger: true,
-                      showTotal: (total) => `Total ${total} artisans`,
-                    }}
-                  />
-                </div>
-              ),
-            },
-          ]}
+        <Table<UserRow>
+          rowKey="_id"
+          columns={activeTab === "USER" ? userColumns : artisanColumns}
+          dataSource={users?.data || []}
+          loading={isLoading}
+          pagination={{
+            current: currentPage,
+            pageSize: perPage,
+            total: users?.pagination?.total || 0,
+            onChange: handlePageChange,
+            // showSizeChanger: true,
+            showTotal: (total) => `Total ${total} ${activeTab === "USER" ? "clients" : "artisans"}`,
+          }}
         />
       </ConfigProvider>
 
