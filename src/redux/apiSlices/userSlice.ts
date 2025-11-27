@@ -3,10 +3,16 @@ import { api } from "../api/baseApi";
 const userSlice = api.injectEndpoints({
   endpoints: (builder) => ({
     admin: builder.query({
-      query: () => {
+      query: (args) => {
+        const params = new URLSearchParams();
+        if(args) {
+           args.forEach((arg: { name: string; value: string }) => {
+            params.append(arg.name, arg.value);
+          });
+        }
         return {
           method: "GET",
-          url: "/user?role=ADMIN",
+          url: "/admin/users",
         };
       },
     }),
