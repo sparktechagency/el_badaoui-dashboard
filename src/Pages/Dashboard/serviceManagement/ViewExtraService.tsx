@@ -136,7 +136,7 @@ const ViewExtraServices = ({ open, onClose, categoryId }: Props) => {
               key: "optionImage",
               render: (src: string) => (
                 <img
-                  src={src}
+                   src={`${import.meta.env.VITE_API_BASE_URL || ""}${src}`} 
                   alt="option"
                   className="w-12 h-12 rounded object-cover border"
                   onError={(e) => {

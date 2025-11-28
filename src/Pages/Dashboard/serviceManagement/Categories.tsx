@@ -50,7 +50,7 @@ const Categories = () => {
       key: "image",
       render: (src: string) => (
         <img 
-          src={`${src}`} 
+          src={`${import.meta.env.VITE_API_BASE_URL || ""}${src}`} 
           alt="category" 
           className="w-12 h-12 rounded object-cover border" 
           onError={(e) => {

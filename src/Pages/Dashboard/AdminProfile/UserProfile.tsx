@@ -30,7 +30,7 @@ interface FormValues {
 // }
 
 const PersonalInfo = () => {
-  
+
   const [imgURL, setImgURL] = useState<string | undefined>();
   const [file, setFile] = useState<File | null>(null);
   const [form] = Form.useForm();
@@ -43,7 +43,7 @@ const PersonalInfo = () => {
   // const fetchAdminProfile: { data?: AdminData } = {};
 
   const adminData = fetchAdminProfile?.data;
-  console.log("adminData", adminData);
+  // console.log("adminData", adminData);
 
   useEffect(() => {
     if (adminData) {

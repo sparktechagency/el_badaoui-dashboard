@@ -236,7 +236,7 @@ const Subcategories = () => {
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold text-[#210630]">{header}</h3>
-          <Button type="primary" onClick={onAddClick}>
+          <Button type="primary" onClick={onAddClick} className="bg-[#3f51b5] text-white h-[45px]">
             <FaPlus /> Add Sub Category
           </Button>
         </div>
@@ -265,8 +265,15 @@ const Subcategories = () => {
         }}
         onOk={onSubmit}
         okText={editingId ? "Save" : "Create"}
+        okButtonProps={{
+          type: "primary",
+          className: "bg-[#3f51b5] text-white h-[40px] mt-4",
+        }}
         confirmLoading={isCreating || isUpdating}
         width={600}
+        cancelButtonProps={{
+          className: " text-white h-[40px] text-black",
+        }}
       >
         <Form
           form={form}
@@ -278,7 +285,7 @@ const Subcategories = () => {
             label="Name"
             rules={[{ required: true, message: "Please enter name" }]}
           >
-            <Input placeholder="Enter subcategory name" />
+            <Input placeholder="Enter subcategory name" className="h-[45px]"/>
           </Form.Item>
 
           <Form.Item
@@ -286,7 +293,7 @@ const Subcategories = () => {
             help={!editingId ? "Image is required for new subcategory" : "Upload new image to replace existing one"}
           >
             <Upload {...uploadProps} listType="picture">
-              <Button icon={<UploadOutlined />}>
+              <Button icon={<UploadOutlined />} className="bg-[#3f51b5] text-white h-[40px]">
                 {fileList.length > 0 ? "Change Image" : "Select Image"}
               </Button>
             </Upload>
@@ -301,6 +308,7 @@ const Subcategories = () => {
               min={0}
               style={{ width: "100%" }}
               placeholder="Enter base area"
+              className="h-[45px]"
             />
           </Form.Item>
 
@@ -313,6 +321,7 @@ const Subcategories = () => {
               min={0}
               style={{ width: "100%" }}
               placeholder="Enter base price"
+              className="h-[45px]"
               prefix="$"
             />
           </Form.Item>
