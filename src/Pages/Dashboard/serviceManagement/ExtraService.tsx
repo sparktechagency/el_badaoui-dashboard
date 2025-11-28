@@ -175,6 +175,8 @@ const AddExtraServiceModal = ({ open, onClose, categoryId, service }: Props) => 
       confirmLoading={isCreating || isUpdating}
       width={800}
       destroyOnClose
+      okButtonProps={{ style: { backgroundColor: "#3f51b5", color: "#fff", height: "40px", marginTop: "20px" } }}
+      cancelButtonProps={{ style: { height: "40px" } }}
     >
       <div className="space-y-4">
         <div>
@@ -183,6 +185,7 @@ const AddExtraServiceModal = ({ open, onClose, categoryId, service }: Props) => 
             placeholder="What type of flooring do you want to Install?"
             value={questionText}
             onChange={(e) => setQuestionText(e.target.value)}
+            className="h-[45px]"
           />
         </div>
 
@@ -192,9 +195,9 @@ const AddExtraServiceModal = ({ open, onClose, categoryId, service }: Props) => 
             <Select
               value={questionType}
               onChange={(value) => setQuestionType(value)}
-              className="w-full"
+              className="w-full h-[45px]"
               options={[
-                { label: "Single Choice", value: "SINGLE_CHOICE" },
+                // { label: "Single Choice", value: "SINGLE_CHOICE" },
                 { label: "Multiple Choice", value: "MULTIPLE_CHOICE" },
                 { label: "Image with Name", value: "IMAGE_NAME" },
               ]}
@@ -212,6 +215,7 @@ const AddExtraServiceModal = ({ open, onClose, categoryId, service }: Props) => 
               icon={<FiPlus />}
               onClick={handleAddOption}
               size="small"
+              className="h-[40px]"
             >
               Add Option
             </Button>
@@ -231,6 +235,7 @@ const AddExtraServiceModal = ({ open, onClose, categoryId, service }: Props) => 
                       size="small"
                       icon={<FiTrash2 />}
                       onClick={() => handleRemoveOption(index)}
+                      className="h-[40px]"
                     />
                   )}
                 </div>
@@ -246,6 +251,7 @@ const AddExtraServiceModal = ({ open, onClose, categoryId, service }: Props) => 
                       onChange={(e) =>
                         handleOptionChange(index, "optionText", e.target.value)
                       }
+                      className="h-[45px]"
                     />
                   </div>
 
@@ -295,7 +301,7 @@ const AddExtraServiceModal = ({ open, onClose, categoryId, service }: Props) => 
                             value || 0
                           )
                         }
-                        className="w-full"
+                        className="w-full h-[45px]"
                       />
                     </div>
 
@@ -308,10 +314,10 @@ const AddExtraServiceModal = ({ open, onClose, categoryId, service }: Props) => 
                         onChange={(value) =>
                           handleOptionChange(index, "priceModifierType", value)
                         }
-                        className="w-full"
+                        className="w-full h-[45px]"
                         options={[
                           { label: "Fixed", value: "FIXED" },
-                          { label: "Percentage", value: "PERCENTAGE" },
+                        //   { label: "Percentage", value: "PERCENTAGE" },
                         ]}
                       />
                     </div>
