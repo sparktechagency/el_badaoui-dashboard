@@ -8,8 +8,9 @@ import logo from "../../../assets/randomProfile2.jpg";
 import rentMeLogo from "../../../assets/navLogo.png";
 import { useFetchAdminProfileQuery, useUpdateAdminProfileMutation } from "@/redux/apiSlices/authSlice";
 import toast from "react-hot-toast";
+import { imageUrl } from "@/redux/api/baseApi";
 
-const baseUrl = import.meta.env.VITE_BASE_URL;
+const baseUrl = imageUrl;
 
 interface FormValues {
   firstName: string;
@@ -19,17 +20,17 @@ interface FormValues {
   phone: string;
 }
 
-interface AdminData {
-  firstName: string;
-  lastName: string;   
-  email: string;
-  address: string;
-  contact: string;
-  profileImg: string;
-}
+// interface AdminData {
+//   firstName: string;
+//   lastName: string;   
+//   email: string;
+//   address: string;
+//   contact: string;
+//   profileImg: string;
+// }
 
 const PersonalInfo = () => {
-  const [contact, setContact] = useState<string>("");
+  
   const [imgURL, setImgURL] = useState<string | undefined>();
   const [file, setFile] = useState<File | null>(null);
   const [form] = Form.useForm();
@@ -54,7 +55,7 @@ const PersonalInfo = () => {
         phone: adminData?.phone,
       });
       setImgURL(`${baseUrl}${adminData?.image}`);
-      setContact(adminData?.phone);
+      // setContact(adminData?.phone);
     }
   }, [form, adminData]);
 
