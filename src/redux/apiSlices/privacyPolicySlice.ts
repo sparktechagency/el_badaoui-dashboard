@@ -6,7 +6,7 @@ const privacyPolicySlice = api.injectEndpoints({
       query: (data) => {
         const token = localStorage.getItem("token");
         return {
-          url: `/others/privacy-policy`,
+          url: `/disclaimers`,
           method: "POST",
           body: data,
           headers: {
@@ -16,10 +16,10 @@ const privacyPolicySlice = api.injectEndpoints({
       },
     }),
     privacyPolicy: builder.query({
-      query: (userType) => {
+      query: () => {
         const token = localStorage.getItem("token");
         return {
-          url: `/others/privacy-policy/${userType}`,
+          url: `/disclaimers/privacy-policy`,
           method: "GET",
           headers: {
             Authorization: token ? `Bearer ${JSON.parse(token)}` : "",

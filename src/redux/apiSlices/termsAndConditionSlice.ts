@@ -6,7 +6,7 @@ const termsAndConditionSlice = api.injectEndpoints({
       query: (data) => {
         const token = localStorage.getItem("token");
         return {
-          url: `/others/terms-and-condition`,
+          url: `/disclaimers`,
           method: "POST",
           body: data,
           headers: {
@@ -16,10 +16,10 @@ const termsAndConditionSlice = api.injectEndpoints({
       },
     }),
     termsAndCondition: builder.query({
-      query: (userType) => {
+      query: () => {
         const token = localStorage.getItem("token");
         return {
-          url: `/others/terms-and-conditions/${userType}`,
+          url: `/disclaimers/terms-and-conditions`,
           method: "GET",
           headers: {
             Authorization: token ? `Bearer ${JSON.parse(token)}` : "",

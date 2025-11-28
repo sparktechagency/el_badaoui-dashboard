@@ -5,9 +5,10 @@ import logo from "../../assets/randomProfile2.jpg";
 import { useFetchAdminProfileQuery } from "../../redux/apiSlices/authSlice";
 
 interface UserData {
-  name?: string;
+  firstName?: string;
+  lastName?: string;
   role?: string;
-  profileImg?: string;
+  image?: string;
 }
 
 interface AdminProfileResponse {
@@ -44,9 +45,9 @@ const Header = () => {
             height: 45,
           }}
           src={
-            userData?.data?.profileImg
-              ? `${(import.meta as any).env.VITE_BASE_URL}${
-                  userData?.data?.profileImg
+            userData?.data?.image
+              ? `${import.meta.env.VITE_API_BASE_URL || ""}${
+                  userData?.data?.image
                 }`
               : logo
           }
@@ -54,8 +55,11 @@ const Header = () => {
           className="clip"
         />
         <div className="flex pr-2 flex-col">
-          <p className="text-xl">{userData?.data?.name || "Unknown Admin"}</p>
-          <p className="text-sm text-gray-500">{userData?.data?.role}</p>
+          <p className="text-xl">
+            {userData?.data?.firstName + " " + userData?.data?.lastName ||
+              "Unknown Admin"}
+          </p>
+          {/* <p className="text-sm text-gray-500">{userData?.data?.role}</p> */}
         </div>
       </div>
     </div>
