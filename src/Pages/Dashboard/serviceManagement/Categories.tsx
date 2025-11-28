@@ -96,7 +96,7 @@ const Categories = () => {
           
           <Tooltip title="Add Extra Service">
             <Button
-              type="primary"
+              // type="primary"
               size="small"
               onClick={() => handleAddService(record._id)}
             >
@@ -209,9 +209,10 @@ const Categories = () => {
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold text-[#210630]">{header}</h3>
           <Button 
-            type="primary" 
+            // type="primary" 
             onClick={onAddClick}
             disabled={isLoadingCategories}
+            className="py-[22px] bg-[#3f51b5] text-white"
           >
             <FaPlus /> Add Category
           </Button>
@@ -228,6 +229,7 @@ const Categories = () => {
               dataSource={categories}
               columns={categoryColumns}
               pagination={{ pageSize: 6 }}
+              size="small"
             />
           </ConfigProvider>
         )}
