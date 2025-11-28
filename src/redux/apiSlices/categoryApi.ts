@@ -46,7 +46,7 @@ const categorySlice = api.injectEndpoints({
 
         return {
           method: "PATCH",
-          url: `/category/${id}`, // ✅ সঠিক endpoint
+          url: `/category/${id}`, 
           body: formData,
         };
       },
@@ -57,7 +57,46 @@ const categorySlice = api.injectEndpoints({
       query: (id) => {
         return {
           method: "DELETE",
-          url: `/category/${id}`, // ✅ সঠিক endpoint
+          url: `/category/${id}`, 
+        };
+      },
+      invalidatesTags: ["Category"],
+    }),
+
+    addExtraService: builder.mutation({
+      query: (formData: FormData) => {
+        return {
+          method: "POST",
+          url: "/questions",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["Category"],
+    }),
+    updateExtraService: builder.mutation({
+      query: ({ id, formData }: { id: string; formData: FormData }) => {
+        return {
+          method: "PATCH",
+          url: `/questions/${id}`,
+          body: formData,
+        };
+      },
+      invalidatesTags: ["Category"],
+    }),
+    getExtraServices: builder.query({
+      query: (id) => {
+        return {
+          method: "GET",
+          url: `/questions/categories/${id}`, 
+        };
+      },
+      providesTags: ["Category"], 
+    }),
+    deleteExtraService: builder.mutation({
+      query: (id) => {
+        return {
+          method: "DELETE",
+          url: `/questions/${id}`, 
         };
       },
       invalidatesTags: ["Category"],
@@ -70,4 +109,8 @@ export const {
   useCreateCategoryMutation,
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
+  useAddExtraServiceMutation,
+  useGetExtraServicesQuery,
+  useUpdateExtraServiceMutation,
+  useDeleteExtraServiceMutation,
 } = categorySlice;

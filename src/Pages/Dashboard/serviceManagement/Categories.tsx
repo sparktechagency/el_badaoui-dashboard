@@ -1,10 +1,16 @@
 import { useMemo, useState } from "react";
-import { Table, Button, Modal, Input, Space, Tag, Upload, ConfigProvider, Spin, message } from "antd";
+import { Table, Button, Modal, Input, Space, Tag, Upload, ConfigProvider, Spin, message, Tooltip } from "antd";
 import type { TableProps, UploadFile } from "antd";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { FiEdit, FiTrash2, FiEye, FiPlus } from "react-icons/fi";
 import { FaPlus } from "react-icons/fa6";
-import { useCreateCategoryMutation, useDeleteCategoryMutation, useGetAllCategoriesQuery, useUpdateCategoryMutation } from "@/redux/apiSlices/categoryApi";
-
+import { 
+  useCreateCategoryMutation, 
+  useDeleteCategoryMutation, 
+  useGetAllCategoriesQuery, 
+  useUpdateCategoryMutation 
+} from "@/redux/apiSlices/categoryApi";
+import ViewExtraServices from "./ViewExtraService";
+import AddExtraServiceModal from "./ExtraService";
 
 type Category = {
   _id: string;
@@ -17,6 +23,11 @@ const Categories = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [imageFile, setImageFile] = useState<UploadFile | null>(null);
+  
+  // Extra Services (SubCategory) Modal States
+  const [viewServicesModalOpen, setViewServicesModalOpen] = useState(false);
+  const [addServiceModalOpen, setAddServiceModalOpen] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
 
   // ✅ API Queries & Mutations
   const { data: categoryData, isLoading: isLoadingCategories } = useGetAllCategoriesQuery(null);
@@ -53,20 +64,45 @@ const Categories = () => {
       key: "action",
       render: (_, record) => (
         <Space>
-          <Button
-            onClick={() => handleEdit(record)}
-            size="small"
-          >
-            <FiEdit />
-          </Button>
-          <Button 
-            danger 
-            size="small"
-            onClick={() => handleDelete(record._id)} 
-            loading={isDeleting}
-          >
-            <FiTrash2 />
-          </Button>
+          <Tooltip title="Edit Category">
+            <Button
+              onClick={() => handleEdit(record)}
+              size="small"
+            >
+              <FiEdit />
+            </Button>
+          </Tooltip>
+          
+          <Tooltip title="Delete Category">
+            <Button 
+              danger 
+              size="small"
+              onClick={() => handleDelete(record._id)} 
+              loading={isDeleting}
+            >
+              <FiTrash2 />
+            </Button>
+          </Tooltip>
+          
+          <Tooltip title="View Extra Services">
+            <Button
+              type="default"
+              size="small"
+              onClick={() => handleViewServices(record._id)}
+            >
+              <FiEye />
+            </Button>
+          </Tooltip>
+          
+          <Tooltip title="Add Extra Service">
+            <Button
+              type="primary"
+              size="small"
+              onClick={() => handleAddService(record._id)}
+            >
+              <FiPlus />
+            </Button>
+          </Tooltip>
         </Space>
       ),
     },
@@ -95,6 +131,16 @@ const Categories = () => {
         }
       },
     });
+  };
+
+  const handleViewServices = (categoryId: string) => {
+    setSelectedCategoryId(categoryId);
+    setViewServicesModalOpen(true);
+  };
+
+  const handleAddService = (categoryId: string) => {
+    setSelectedCategoryId(categoryId);
+    setAddServiceModalOpen(true);
   };
 
   const onAddClick = () => {
@@ -187,7 +233,7 @@ const Categories = () => {
         )}
       </div>
 
-      {/* Modal */}
+      {/* Category Modal */}
       <Modal
         open={open}
         title={editingId ? "Edit Category" : "Add Category"}
@@ -233,6 +279,26 @@ const Categories = () => {
           </div>
         </div>
       </Modal>
+
+      {/* View Extra Services (SubCategory) Modal */}
+      <ViewExtraServices
+        open={viewServicesModalOpen}
+        onClose={() => {
+          setViewServicesModalOpen(false);
+          setSelectedCategoryId(null);
+        }}
+        categoryId={selectedCategoryId}
+      />
+
+      {/* Add Extra Service (SubCategory) Modal */}
+      <AddExtraServiceModal
+        open={addServiceModalOpen}
+        onClose={() => {
+          setAddServiceModalOpen(false);
+          setSelectedCategoryId(null);
+        }}
+        categoryId={selectedCategoryId}
+      />
     </div>
   );
 };

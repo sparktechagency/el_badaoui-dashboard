@@ -247,8 +247,9 @@ const Subcategories = () => {
             rowKey="_id"
             dataSource={subcategories}
             columns={subCategoryColumns}
-            pagination={{ pageSize: 6 }}
+            pagination={{ pageSize: 10 }}
             loading={isLoading}
+            size="small"
           />
         </ConfigProvider>
       </div>
