@@ -23,34 +23,39 @@ const ourProjectsSlice = api.injectEndpoints({
           params,
         };
       },
+      providesTags: ["Projects"],
     }),
 
     createPreviousProject: builder.mutation({
-      query: (data) => {
+      query: (formData) => {
         const token = localStorage.getItem("token");
         return {
           url: `/previousproject`,
           method: "POST",
-          body: data,
+          body: formData,
           headers: {
             Authorization: token ? `Bearer ${JSON.parse(token)}` : "",
           },
         };
       },
+      invalidatesTags: ["Projects"],
     }),
+
     updatePreviousProject: builder.mutation({
-      query: ({ id, ...data }) => {
+      query: ({ id, formData }) => {
         const token = localStorage.getItem("token");
         return {
           url: `/previousproject/${id}`,
           method: "PATCH",
-          body: data,
+          body: formData,
           headers: {
             Authorization: token ? `Bearer ${JSON.parse(token)}` : "",
           },
         };
       },
+      invalidatesTags: ["Projects"],
     }),
+
     deletePreviousProject: builder.mutation({
       query: (id) => {
         const token = localStorage.getItem("token");
@@ -62,6 +67,7 @@ const ourProjectsSlice = api.injectEndpoints({
           },
         };
       },
+      invalidatesTags: ["Projects"],
     }),
   }),
 });

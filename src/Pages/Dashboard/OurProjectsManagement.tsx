@@ -64,18 +64,11 @@ const OurProjectsManagement = () => {
         title: project.title,
         description: project.description,
       });
-      setFileList([
-        {
-          uid: "-1",
-          name: "image.jpg",
-          status: "done",
-          url: project.image,
-        },
-      ]);
+      setFileList(null);
     } else {
       setEditingProject(null);
       form.resetFields();
-      setFileList([]);
+      setFileList(null);
     }
     setIsModalVisible(true);
   };
@@ -84,7 +77,7 @@ const OurProjectsManagement = () => {
     setIsModalVisible(false);
     setEditingProject(null);
     form.resetFields();
-    setFileList([]);
+    setFileList(null);
   };
 
   const handleOpenViewModal = (project: Project) => {
@@ -110,14 +103,16 @@ const OurProjectsManagement = () => {
       formData.append("title", values.title);
       formData.append("description", values.description);
 
-      if (fileList.length > 0 && fileList[0].originFileObj) {
+      // Check if new file is uploaded
+      if (fileList.length > 0) {
         formData.append("image", fileList[0].originFileObj);
       }
 
       if (editingProject) {
+        // For update, spread the id with formData
         await updateProject({
           id: editingProject._id,
-          ...Object.fromEntries(formData),
+          formData: formData,
         }).unwrap();
         message.success("Project updated successfully!");
       } else {
@@ -128,6 +123,7 @@ const OurProjectsManagement = () => {
       handleCloseModal();
     } catch (error: any) {
       message.error(error?.data?.message || "Operation failed!");
+      console.error("Submit error:", error);
     }
   };
 
@@ -145,7 +141,7 @@ const OurProjectsManagement = () => {
       title: "Image",
       dataIndex: "image",
       key: "image",
-    //   width: 100,
+      width: 100,
       render: (image: string) => (
         <Image
           src={image}
@@ -173,7 +169,7 @@ const OurProjectsManagement = () => {
     {
       title: "Action",
       key: "action",
-    //   width: 200,
+      width: 200,
       render: (_, record) => (
         <Space size="small">
           <Button
@@ -210,19 +206,30 @@ const OurProjectsManagement = () => {
 
   const uploadProps = {
     fileList,
-    beforeUpload: (file: any) => {
+    beforeUpload: (file) => {
       const isImage = file.type.startsWith("image/");
       if (!isImage) {
         message.error("You can only upload image files!");
-        return false;
+        return Upload.LIST_IGNORE;
       }
-      setFileList([file]);
+
+      setFileList([
+        {
+          uid: file.uid,
+          name: file.name,
+          status: "done",
+          originFileObj: file,
+          url: URL.createObjectURL(file),
+        },
+      ]);
+
       return false;
     },
     onRemove: () => {
       setFileList([]);
     },
     maxCount: 1,
+    listType: "picture",
   };
 
   return (
@@ -296,10 +303,11 @@ const OurProjectsManagement = () => {
 
           <Form.Item
             label="Upload Image"
+            name="image"
             rules={[
               {
                 validator: () =>
-                  fileList.length > 0 || editingProject
+                  fileList || editingProject
                     ? Promise.resolve()
                     : Promise.reject(new Error("Please upload an image!")),
               },
