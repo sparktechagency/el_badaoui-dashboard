@@ -64,11 +64,19 @@ const OurProjectsManagement = () => {
         title: project.title,
         description: project.description,
       });
-      setFileList(null);
+      setFileList([
+        {
+          uid: project.image,
+          name: project.title,
+          status: "done",
+          originFileObj: project.image,
+          url: project.image,
+        },
+      ]);
     } else {
       setEditingProject(null);
       form.resetFields();
-      setFileList(null);
+      setFileList([]);
     }
     setIsModalVisible(true);
   };
@@ -77,7 +85,7 @@ const OurProjectsManagement = () => {
     setIsModalVisible(false);
     setEditingProject(null);
     form.resetFields();
-    setFileList(null);
+    setFileList([]);
   };
 
   const handleOpenViewModal = (project: Project) => {
@@ -138,15 +146,22 @@ const OurProjectsManagement = () => {
 
   const columns: ColumnsType<Project> = [
     {
+      title: "Serial",
+      dataIndex: "",
+      key: "serial",
+      width: 100,
+      render: (_, __, index) => index + 1,
+    },
+    {
       title: "Image",
       dataIndex: "image",
       key: "image",
-      width: 100,
+      width: 150,
       render: (image: string) => (
         <Image
-          src={image}
+          src={`${import.meta.env.VITE_API_BASE_URL || ""}${image}`} 
           alt="Project"
-          width={60}
+          width={120}
           height={60}
           style={{ objectFit: "cover", borderRadius: 4 }}
         />
@@ -169,7 +184,7 @@ const OurProjectsManagement = () => {
     {
       title: "Action",
       key: "action",
-      width: 200,
+    //   width: 200,
       render: (_, record) => (
         <Space size="small">
           <Button
@@ -206,7 +221,7 @@ const OurProjectsManagement = () => {
 
   const uploadProps = {
     fileList,
-    beforeUpload: (file) => {
+    beforeUpload: (file: File) => {
       const isImage = file.type.startsWith("image/");
       if (!isImage) {
         message.error("You can only upload image files!");
@@ -215,7 +230,7 @@ const OurProjectsManagement = () => {
 
       setFileList([
         {
-          uid: file.uid,
+          uid: file.name,
           name: file.name,
           status: "done",
           originFileObj: file,
@@ -246,9 +261,10 @@ const OurProjectsManagement = () => {
           Our Projects
         </h1>
         <Button
-          type="primary"
+       
           icon={<PlusOutlined />}
           onClick={() => handleOpenModal()}
+          className="py-[22px] bg-[#3f51b5] text-white"
         >
           New Projects
         </Button>
@@ -267,7 +283,7 @@ const OurProjectsManagement = () => {
           showSizeChanger: false,
           showTotal: (total) => `Total ${total} items`,
         }}
-        bordered
+      
       />
 
       <Modal
@@ -316,9 +332,9 @@ const OurProjectsManagement = () => {
             <Upload {...uploadProps} listType="picture">
               <Button icon={<UploadOutlined />}>Select Files</Button>
             </Upload>
-            <div style={{ color: "#888", fontSize: "12px", marginTop: "8px" }}>
+            {/* <div style={{ color: "#888", fontSize: "12px", marginTop: "8px" }}>
               Photos, Jpg, Png... Drag and drop or click to upload
-            </div>
+            </div> */}
           </Form.Item>
 
           <Form.Item style={{ marginBottom: 0, textAlign: "right" }}>
@@ -340,56 +356,58 @@ const OurProjectsManagement = () => {
         title="View Project"
         open={isViewModalVisible}
         onCancel={handleCloseViewModal}
-        footer={[
-          <Button key="close" onClick={handleCloseViewModal}>
-            Close
-          </Button>,
-          <Button
-            key="edit"
-            type="primary"
-            icon={<EditOutlined />}
-            onClick={handleEditFromView}
-          >
-            Edit Project
-          </Button>,
-        ]}
+        // footer={[
+        //   <Button key="close" onClick={handleCloseViewModal}>
+        //     Close
+        //   </Button>,
+        //   <Button
+        //     key="edit"
+        //     type="primary"
+        //     icon={<EditOutlined />}
+        //     onClick={handleEditFromView}
+        //   >
+        //     Edit Project
+        //   </Button>,
+        // ]}
+     footer={null}
         width={700}
       >
         {viewingProject && (
           <div>
             <div style={{ marginBottom: "16px" }}>
               <Image
-                src={viewingProject.image}
+                src={`${import.meta.env.VITE_API_BASE_URL || ""}${viewingProject.image}`} 
                 alt={viewingProject.title}
                 style={{
-                  width: "100%",
-                  maxHeight: "400px",
+                  width: "650px",
+                  maxHeight: "370px",
                   objectFit: "cover",
                   borderRadius: "8px",
+                //   margin: "0 auto",
                 }}
               />
             </div>
             <div style={{ marginBottom: "16px" }}>
-              <h3 style={{ marginBottom: "8px", color: "#262626" }}>
-                Project Name
-              </h3>
-              <p style={{ fontSize: "16px", color: "#595959" }}>
+              
+                Project Name:  
+            
+              <span style={{ fontSize: "16px",fontWeight:"bold" }}>
                 {viewingProject.title}
-              </p>
+              </span>
             </div>
             <div>
-              <h3 style={{ marginBottom: "8px", color: "#262626" }}>
-                Description
-              </h3>
-              <p
+             
+               <span style={{ fontSize: "14px",fontWeight:"bold" }}> Description: </span>
+            
+              <span
                 style={{
                   fontSize: "14px",
-                  color: "#595959",
+                
                   lineHeight: "1.6",
                 }}
               >
                 {viewingProject.description}
-              </p>
+              </span>
             </div>
           </div>
         )}
