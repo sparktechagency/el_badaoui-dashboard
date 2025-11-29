@@ -7,7 +7,7 @@ interface LoginData {
 
 interface OtpVerifyData {
   email: string;
-  oneTimeCode: string;
+  oneTimeCode: number;
 }
 
 interface ForgotPasswordData {

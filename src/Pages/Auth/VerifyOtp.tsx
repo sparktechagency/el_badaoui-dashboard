@@ -18,7 +18,8 @@ interface ApiResponse {
 const VerifyOtp = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [otp, setOtp] = useState<string>("");
+  const [otp, setOtp] = useState<number | undefined>();
+
   const email = new URLSearchParams(location.search).get("email"); // Get email from query params
 
   console.log(typeof otp);
@@ -28,6 +29,11 @@ const VerifyOtp = () => {
 
   const onFinish = async (): Promise<void> => {
     try {
+      if (!otp) {
+        alert("Please enter the OTP");
+        return;
+      }
+
       const response = (await otpVerify({
         email: email || "",
         oneTimeCode: otp,
@@ -74,14 +80,14 @@ const VerifyOtp = () => {
       <Form layout="vertical" onFinish={onFinish}>
         <div className="flex items-center justify-center mb-6">
           <OTPInput
-            value={otp}
-            onChange={(otp: string) => setOtp(otp)}
+            value={otp?.toString() || ""}
+            onChange={(otpString: string) => setOtp(Number(otpString))} // string -> number
             numInputs={6}
             inputStyle={{
               height: 50,
               width: 50,
               borderRadius: "8px",
-              margin: "16px",
+              margin: "6px",
               fontSize: "20px",
               border: "1px solid #8b0000",
               color: "#2B2A2A",

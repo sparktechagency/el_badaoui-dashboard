@@ -39,7 +39,8 @@ const Login = () => {
 
       navigate("/"); 
     } catch (err) {
-      toast.error("Login failed");
+      console.log(err);
+      toast.error((err as any) || "Login failed");
     }
   };
 

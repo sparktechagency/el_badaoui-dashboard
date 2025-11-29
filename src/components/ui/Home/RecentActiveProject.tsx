@@ -22,8 +22,8 @@ console.log("Recent Project", recentProject);
     recentProject?.data?.map((item: any) => ({
       key: item._id,
       projectId: item.projectCode,
-      clientName: `${item?.userId?.firstName || ""} ${
-        item?.userId?.lastName || ""
+      clientName: `${item?.firstName || ""} ${
+        item?.lastName || ""
       }`,
       artisan: item?.artisanId ?` ${item?.artisanId?.firstName || ""} ${
         item?.artisanId?.lastName || ""
