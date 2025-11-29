@@ -118,17 +118,18 @@ const AppointmentManagement = () => {
   }
 
   return (
-    <div>
+    <div className="bg-white rounded-2xl p-4 shadow-sm">
       <div >
        
 
-        <Card style={{ marginBottom: 24 }}>
+        <div >
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
               flexWrap: "wrap",
               gap: 16,
+               marginBottom: 24
             }}
           >
             <div >
@@ -153,7 +154,7 @@ const AppointmentManagement = () => {
               </Select>
             </div>
           </div>
-        </Card>
+        </div>
 
           <Table
             columns={columns}
@@ -165,9 +166,9 @@ const AppointmentManagement = () => {
               pageSize: perPage,
               total: data?.pagination?.total || 0,
               onChange: setCurrentPage,
-              showTotal: (total, range) =>
-                `${range[0]}-${range[1]} of ${total} items`,
-              position: ["bottomCenter"],
+            //   showTotal: (total, range) =>
+            //     `${range[0]}-${range[1]} of ${total} items`,
+              position: ["bottomRight"],
             }}
           />
       

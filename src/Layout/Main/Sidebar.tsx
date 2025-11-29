@@ -145,14 +145,14 @@ const Sidebar = () => {
             </Link>
           ),
         },
-        // {
-        //   key: "/f-a-q",
-        //   label: (
-        //     <Link to="/f-a-q" className="text-white hover:text-white">
-        //       FAQ
-        //     </Link>
-        //   ),
-        // },
+        {
+          key: "/set-time",
+          label: (
+            <Link to="/set-time" className="text-white hover:text-white">
+            Available Time
+            </Link>
+          ),
+        },
       ],
     },
     {

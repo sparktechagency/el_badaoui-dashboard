@@ -97,12 +97,7 @@ const OurProjectsManagement = () => {
     setViewingProject(null);
   };
 
-  const handleEditFromView = () => {
-    if (viewingProject) {
-      handleCloseViewModal();
-      handleOpenModal(viewingProject);
-    }
-  };
+
 
   const handleSubmit = async (values: any) => {
     try {
@@ -148,7 +143,8 @@ const OurProjectsManagement = () => {
       title: "Serial",
       dataIndex: "",
       key: "serial",
-      width: 100,
+      width: 80,
+      align: "center",
       render: (_, __, index) => index + 1,
     },
     {
@@ -247,13 +243,13 @@ const OurProjectsManagement = () => {
   };
 
   return (
-    <div style={{ padding: "24px" }}>
+    <div className="bg-white rounded-2xl p-4 shadow-sm">
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: "24px",
+     marginBottom: "24px"
         }}
       >
         <h1 style={{ margin: 0, fontSize: "28px", fontWeight: "bold" }}>
@@ -281,6 +277,7 @@ const OurProjectsManagement = () => {
           showSizeChanger: false,
           showTotal: (total) => `Total ${total} items`,
         }}
+        size="small"
       />
 
       <Modal
