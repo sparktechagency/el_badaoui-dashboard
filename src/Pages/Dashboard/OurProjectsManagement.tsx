@@ -16,6 +16,7 @@ import {
   EyeOutlined,
   DeleteOutlined,
   UploadOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import {
@@ -36,7 +37,9 @@ const OurProjectsManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage] = useState(10);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [viewingProject, setViewingProject] = useState<Project | null>(null);
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<any[]>([]);
 
@@ -82,6 +85,23 @@ const OurProjectsManagement = () => {
     setEditingProject(null);
     form.resetFields();
     setFileList([]);
+  };
+
+  const handleOpenViewModal = (project: Project) => {
+    setViewingProject(project);
+    setIsViewModalVisible(true);
+  };
+
+  const handleCloseViewModal = () => {
+    setIsViewModalVisible(false);
+    setViewingProject(null);
+  };
+
+  const handleEditFromView = () => {
+    if (viewingProject) {
+      handleCloseViewModal();
+      handleOpenModal(viewingProject);
+    }
   };
 
   const handleSubmit = async (values: any) => {
@@ -153,16 +173,24 @@ const OurProjectsManagement = () => {
     {
       title: "Action",
       key: "action",
-    //   width: 150,
+    //   width: 200,
       render: (_, record) => (
         <Space size="small">
           <Button
             type="link"
             icon={<EyeOutlined />}
-            onClick={() => handleOpenModal(record)}
+            onClick={() => handleOpenViewModal(record)}
             style={{ color: "#52c41a" }}
           >
             View
+          </Button>
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            onClick={() => handleOpenModal(record)}
+            style={{ color: "#1890ff" }}
+          >
+            Edit
           </Button>
           <Popconfirm
             title="Delete Project"
@@ -198,7 +226,7 @@ const OurProjectsManagement = () => {
   };
 
   return (
-    <div >
+    <div style={{ padding: "24px" }}>
       <div
         style={{
           display: "flex",
@@ -232,8 +260,7 @@ const OurProjectsManagement = () => {
           showSizeChanger: false,
           showTotal: (total) => `Total ${total} items`,
         }}
-        size="small"
-        // bordered
+        bordered
       />
 
       <Modal
@@ -299,6 +326,65 @@ const OurProjectsManagement = () => {
             </Space>
           </Form.Item>
         </Form>
+      </Modal>
+
+      <Modal
+        title="View Project"
+        open={isViewModalVisible}
+        onCancel={handleCloseViewModal}
+        footer={[
+          <Button key="close" onClick={handleCloseViewModal}>
+            Close
+          </Button>,
+          <Button
+            key="edit"
+            type="primary"
+            icon={<EditOutlined />}
+            onClick={handleEditFromView}
+          >
+            Edit Project
+          </Button>,
+        ]}
+        width={700}
+      >
+        {viewingProject && (
+          <div>
+            <div style={{ marginBottom: "16px" }}>
+              <Image
+                src={viewingProject.image}
+                alt={viewingProject.title}
+                style={{
+                  width: "100%",
+                  maxHeight: "400px",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                }}
+              />
+            </div>
+            <div style={{ marginBottom: "16px" }}>
+              <h3 style={{ marginBottom: "8px", color: "#262626" }}>
+                Project Name
+              </h3>
+              <p style={{ fontSize: "16px", color: "#595959" }}>
+                {viewingProject.title}
+              </p>
+            </div>
+            <div>
+              <h3 style={{ marginBottom: "8px", color: "#262626" }}>
+                Description
+              </h3>
+              <p
+                style={{
+                  fontSize: "14px",
+                  color: "#595959",
+                  lineHeight: "1.6",
+                }}
+              >
+                {viewingProject.description}
+              </p>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );
