@@ -55,6 +55,14 @@ const projectManagementApi = api.injectEndpoints({
         { type: "ProjectManagement", id },
       ],
     }),
+
+    getAllArtisan: builder.query({
+      query: () => ({
+        method: "GET",
+        url: "/admin/all-artisan",
+      }),
+      providesTags: ["ProjectManagement"],
+    }),
   }),
 });
 
@@ -62,4 +70,5 @@ export const {
   useProjectManagementQuery,
   useSingleProjectManagementQuery,
   useUpdateProjectManagementMutation,
+  useGetAllArtisanQuery,
 } = projectManagementApi;

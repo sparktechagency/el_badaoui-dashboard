@@ -2,10 +2,8 @@ import { useSingleProjectManagementQuery, useUpdateProjectManagementMutation } f
 import { Button, Tag, Descriptions, Spin, Select, InputNumber, message, Modal } from "antd";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
-// import {
-//   useSingleProjectManagementQuery,
-//   useUpdateProjectManagementMutation,
-// } from "../api/projectManagementApi";
+import { useGetAllArtisanQuery } from "@/redux/apiSlices/projectManagementApi";
+
 
 type Status = "NEW" | "COMPLETED" | "ACCEPTED";
 
@@ -31,12 +29,16 @@ const ProjectManagementDetails = () => {
   });
   
   const [updateProject, { isLoading: isUpdating }] = useUpdateProjectManagementMutation();
+  const { data: artisanData, isLoading: isArtisanLoading } = useGetAllArtisanQuery(null);
+  console.log(artisanData);
 
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [isVatModalOpen, setIsVatModalOpen] = useState(false);
+  const [isArtisanModalOpen, setIsArtisanModalOpen] = useState(false); // NEW: Artisan modal state
   const [selectedStatus, setSelectedStatus] = useState<Status | undefined>();
   const [totalWithoutVat, setTotalWithoutVat] = useState<number | undefined>();
   const [totalWithVat, setTotalWithVat] = useState<number | undefined>();
+  const [selectedArtisanId, setSelectedArtisanId] = useState<string | undefined>(); // NEW: Selected artisan state
 
   const details = data?.data;
 
@@ -55,6 +57,14 @@ const ProjectManagementDetails = () => {
       setTotalWithVat(details.totalWithVat);
     }
     setIsVatModalOpen(true);
+  };
+
+  // NEW: Open Artisan modal with current artisan as default
+  const openArtisanModal = () => {
+    if (details?.artisanId) {
+      setSelectedArtisanId(details.artisanId._id);
+    }
+    setIsArtisanModalOpen(true);
   };
 
   const handleStatusUpdate = async () => {
@@ -100,6 +110,33 @@ const ProjectManagementDetails = () => {
     }
   };
 
+  // NEW: Handle artisan assignment
+  const handleArtisanUpdate = async () => {
+    if (!id || !selectedArtisanId) {
+      message.warning("Please select an artisan");
+      return;
+    }
+    
+    try {
+      await updateProject({
+        id,
+        artisanId: selectedArtisanId,
+      }).unwrap();
+      
+      message.success("Artisan assigned successfully");
+      setIsArtisanModalOpen(false);
+      setSelectedArtisanId(undefined);
+    } catch (error) {
+      message.error("Failed to assign artisan");
+    }
+  };
+
+  // NEW: Prepare artisan options for dropdown
+  const artisanOptions = artisanData?.data?.map((artisan: any) => ({
+    label: `${artisan.firstName} ${artisan.lastName}`,
+    value: artisan._id,
+  })) || [];
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -128,24 +165,15 @@ const ProjectManagementDetails = () => {
           <h1 className="text-2xl font-bold text-[#210630]">
             {details.projectCode}
           </h1>
-          {/* <div className="mt-2">
-            <Tag color={statusColor[details.status as Status]} style={{ color: "#fff" }}>
-              {details.status}
-            </Tag>
-          </div> */}
         </div>
         <div className="flex items-center gap-3">
-          <Button  type="default" onClick={openStatusModal} className="py-[22px]">
+          <Button type="default" onClick={openStatusModal} className="py-[22px]">
             Update Status
           </Button>
           <Button type="default" onClick={openVatModal} className="py-[22px]">
             Update Values
           </Button>
-
-
-          {/* <Button type="primary">Send Message</Button> */}
-
-            <Button 
+          <Button 
             type="default"
             onClick={() => {
               if (details?.email) {
@@ -222,14 +250,26 @@ const ProjectManagementDetails = () => {
           </div>
         </div>
 
+        {/* UPDATED: Artisan section with assign button */}
         <div className="bg-white w-[33%] rounded-2xl p-4 shadow-sm">
-          <h3 className="text-lg font-semibold text-[#210630]">
-            Artisan: {artisanName}
-          </h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-semibold text-[#210630]">
+              Artisan: {artisanName}
+            </h3>
+            <Button 
+              // type="primary" 
+              size="small" 
+              onClick={openArtisanModal}
+              loading={isArtisanLoading}
+              className="py-[16px] bg-[#3f51b5] text-white"
+            >
+              {details.artisanId ? "Change" : "Assign"}
+            </Button>
+          </div>
           <div className="mt-3 space-y-2 text-sm text-gray-700">
             {details.artisanId ? (
               <>
-                <div>ID: {details.artisanId._id}</div>
+                <div>ID: {details.artisanId._id.slice(-6)}</div>
                 <div>Name: {artisanName}</div>
               </>
             ) : (
@@ -309,6 +349,41 @@ const ProjectManagementDetails = () => {
             <div className="mt-1 text-xs text-gray-500">
               Current: {currency(details?.totalWithVat || 0)}
             </div>
+          </div>
+        </div>
+      </Modal>
+
+      {/* NEW: Artisan Assignment Modal */}
+      <Modal
+        title="Assign Artisan to Project"
+        open={isArtisanModalOpen}
+        onOk={handleArtisanUpdate}
+        onCancel={() => {
+          setIsArtisanModalOpen(false);
+          setSelectedArtisanId(undefined);
+        }}
+        confirmLoading={isUpdating}
+        okButtonProps={{ style: { backgroundColor: "#3f51b5", color: "#fff", height: "40px" } }}
+        cancelButtonProps={{ style: { height: "40px" } }}
+        okText="Assign"
+      >
+        <div className="py-4">
+          <label className="block text-sm font-medium mb-2">Select Artisan</label>
+          <Select
+            className="w-full h-12"
+            value={selectedArtisanId}
+            onChange={setSelectedArtisanId}
+            options={artisanOptions}
+            placeholder="Choose an artisan"
+            loading={isArtisanLoading}
+            showSearch
+            filterOption={(input, option) =>
+              String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+            }
+           
+          />
+          <div className="mt-2 text-xs text-gray-500">
+            Current artisan: <span className="font-medium">{artisanName}</span>
           </div>
         </div>
       </Modal>

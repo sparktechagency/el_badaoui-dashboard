@@ -1,17 +1,28 @@
-import  { useState, useEffect } from 'react';
-import { Card, TimePicker, Button, Space, Typography, message, Spin, Alert } from 'antd';
-import moment from 'moment-timezone';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  TimePicker,
+  Button,
+  Space,
+  Typography,
+  message,
+  Spin,
+  Alert,
+} from "antd";
+import moment from "moment-timezone";
 
 import {
   useGetAvailableTimesQuery,
   useUpdateAvailableTimeMutation,
-} from '@/redux/apiSlices/availableTimeApi';
+} from "@/redux/apiSlices/availableTimeApi";
 
 const { Title, Text } = Typography;
 
 const AvailableTime = () => {
-  const { data, isLoading, isError, error, refetch } = useGetAvailableTimesQuery(null);
-  const [updateAvailableTime, { isLoading: isUpdating }] = useUpdateAvailableTimeMutation();
+  const { data, isLoading, isError, error, refetch } =
+    useGetAvailableTimesQuery(null);
+  const [updateAvailableTime, { isLoading: isUpdating }] =
+    useUpdateAvailableTimeMutation();
 
   const [isEditing, setIsEditing] = useState(false);
   const [startTime, setStartTime] = useState(null);
@@ -29,8 +40,8 @@ const AvailableTime = () => {
     if (!isEditing && data?.data && userTimezone) {
       const start = moment.tz(data.data.startTime, userTimezone);
       const end = moment.tz(data.data.endTime, userTimezone);
-      setStartTime(start);
-      setEndTime(end);
+      setStartTime(start as any);
+      setEndTime(end as any);
     }
   }, [data, userTimezone, isEditing]);
 
@@ -40,15 +51,25 @@ const AvailableTime = () => {
       return;
     }
 
-    const startTimeWithTz = moment.tz({
-      hour: startTime.hour(),
-      minute: startTime.minute(),
-    }, userTimezone).toISOString();
+    const startTimeWithTz = moment
+      .tz(
+        {
+          hour: (startTime as moment.Moment).hour(),
+          minute: (startTime as moment.Moment).minute(),
+        },
+        userTimezone
+      )
+      .toISOString();
 
-    const endTimeWithTz = moment.tz({
-      hour: endTime.hour(),
-      minute: endTime.minute(),
-    }, userTimezone).toISOString();
+    const endTimeWithTz = moment
+      .tz(
+        {
+          hour: (endTime as moment.Moment).hour(),
+          minute: (endTime as moment.Moment).minute(),
+        },
+        userTimezone
+      )
+      .toISOString();
 
     const payload = {
       startTime: startTimeWithTz,
@@ -56,7 +77,7 @@ const AvailableTime = () => {
     };
 
     try {
-      const result = await updateAvailableTime(payload).unwrap();
+      await updateAvailableTime(payload).unwrap();
       message.success("Working hours updated successfully");
       setIsEditing(false);
       refetch();
@@ -70,15 +91,22 @@ const AvailableTime = () => {
     if (data?.data) {
       const start = moment.tz(data.data.startTime, userTimezone);
       const end = moment.tz(data.data.endTime, userTimezone);
-      setStartTime(start);
-      setEndTime(end);
+      setStartTime(start as any);
+      setEndTime(end as any);
     }
     setIsEditing(false);
   };
 
   if (isLoading) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
         <Spin size="large" />
       </div>
     );
@@ -86,49 +114,86 @@ const AvailableTime = () => {
 
   if (isError) {
     return (
-      <Alert type="error" message="Error" description={error?.message || "Failed to load"} />
+      <Alert
+        type="error"
+        message="Error"
+        description={
+          (error as any)?.data?.message ||
+          (error as any)?.message ||
+          "Failed to load"
+        }
+      />
     );
   }
 
   return (
-    <div style={{ minHeight: "100vh", padding: 32, maxWidth: 800, margin: "0 auto" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        padding: 32,
+        maxWidth: 800,
+        margin: "0 auto",
+      }}
+    >
       <Card
         title={
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <Title level={4}>Available Working Hours</Title>
             {!isEditing && (
-              <Button type="primary" onClick={() => setIsEditing(true)}>Edit</Button>
+              <Button onClick={() => setIsEditing(true)}>Edit</Button>
             )}
           </div>
         }
       >
         {!isEditing ? (
           <Space direction="vertical" size="large" style={{ width: "100%" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 16,
+              }}
+            >
               <Card size="small">
                 <Text>Start Time</Text>
-                <Title level={3}>{startTime?.format("HH:mm")}</Title>
+                <Title level={3}>
+                  {startTime
+                    ? (startTime as moment.Moment).format("HH:mm")
+                    : "--:--"}
+                </Title>
               </Card>
               <Card size="small">
                 <Text>End Time</Text>
-                <Title level={3}>{endTime?.format("HH:mm")}</Title>
+                <Title level={3}>
+                  {endTime
+                    ? (endTime as moment.Moment).format("HH:mm")
+                    : "--:--"}
+                </Title>
               </Card>
             </div>
 
             <Alert
-              message={`Timezone: ${userTimezone} (UTC${moment.tz(userTimezone).format("Z")})`}
+              message={`Timezone: ${userTimezone} (UTC${moment
+                .tz(userTimezone)
+                .format("Z")})`}
               type="info"
               showIcon
             />
           </Space>
         ) : (
           <Space direction="vertical" size="large" style={{ width: "100%" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 16,
+              }}
+            >
               <div>
                 <Text strong>Start Time</Text>
                 <TimePicker
                   value={startTime}
-                  onChange={(t) => setStartTime(t)}
+                  onChange={(t) => setStartTime(t as any)}
                   format="HH:mm"
                   size="large"
                   style={{ width: "100%" }}
@@ -139,7 +204,7 @@ const AvailableTime = () => {
                 <Text strong>End Time</Text>
                 <TimePicker
                   value={endTime}
-                  onChange={(t) => setEndTime(t)}
+                  onChange={(t) => setEndTime(t as any)}
                   format="HH:mm"
                   size="large"
                   style={{ width: "100%" }}
@@ -164,7 +229,9 @@ const AvailableTime = () => {
               >
                 Save
               </Button>
-              <Button size="large" onClick={handleCancel}>Cancel</Button>
+              <Button size="large" onClick={handleCancel}>
+                Cancel
+              </Button>
             </div>
           </Space>
         )}
