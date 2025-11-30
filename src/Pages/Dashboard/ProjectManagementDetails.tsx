@@ -294,9 +294,12 @@ const ProjectManagementDetails = () => {
             {details.artisanId ? (
               <>
                 {/* <div>ID: {details.artisanId._id.slice(-6)}</div> */}
-                <div>Name: {artisanName}</div>
-                <div>Email: {details.artisanId?.email}</div>
-                {/* <div>Phone: {details.artisanId?.phone || "N/A"}</div> */}
+                {/* <p>Name: {artisanName}</p> */}
+                <p>Email: {details.artisanId?.email}</p>
+                <p>Phone: {details.artisanId?.phone || "N/A"}</p>
+                <p>Speciality: {details.artisanId?.speciality || "N/A"}</p>
+                <p>Total Projects: {details.artisanId?.totalProjects || "N/A"}</p>
+
               </>
             ) : (
               <div>No artisan assigned</div>

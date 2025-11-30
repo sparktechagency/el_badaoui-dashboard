@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import JoditEditor from "jodit-react";
 import Title from "../../components/common/Title";
-import rentMeLogo from "../../assets/navLogo.png";
+import rentMeLogo from "../../assets/logo.png";
 import { toast } from "react-hot-toast";
 import {
   useTermsAndConditionQuery,
@@ -52,7 +52,8 @@ const TermsAndCondition = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <img src={rentMeLogo} alt="" />
+        <img src={rentMeLogo} alt="" className="w-[120px] h-[42px]"/>
+        <p className="text-[14px] text-[#6b7280]">...</p>
       </div>
     );
   }

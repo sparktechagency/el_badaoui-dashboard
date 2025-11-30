@@ -37,6 +37,7 @@ type UserRow = {
   role: string;
   status: "ACTIVE" | "INACTIVE";
   speciality?: string;
+  phone?: string;
 };
 
 const statusTag = (s: "ACTIVE" | "INACTIVE") => (
@@ -188,6 +189,7 @@ const Users = () => {
       lastName: record.lastName,
       email: record.email,
       speciality: record.speciality,
+      phone: record.phone,
     });
     setArtisanModalOpen(true);
   };
@@ -257,6 +259,7 @@ const Users = () => {
       render: (_, record) => `${record.firstName} ${record.lastName}`,
     },
     { title: "Email", dataIndex: "email", key: "email" },
+    { title: "Phone", dataIndex: "phone", key: "phone" },
     { title: "Speciality", dataIndex: "speciality", key: "speciality" },
     { title: "Status", dataIndex: "status", key: "status", render: statusTag },
     {
@@ -399,6 +402,9 @@ const Users = () => {
             <Descriptions.Item label="Email">
               {selected.email}
             </Descriptions.Item>
+            <Descriptions.Item label="Phone">
+              {selected.phone || "N/A"}
+            </Descriptions.Item>
             <Descriptions.Item label="Role">{selected.role}</Descriptions.Item>
             {selected.speciality && (
               <Descriptions.Item label="Speciality">
@@ -456,55 +462,84 @@ const Users = () => {
           setSelected(null);
         }}
         footer={null}
+        width={800}
       >
         <Form form={form} layout="vertical" onFinish={handleArtisanSubmit}>
-          <Form.Item
-            label="First Name"
-            name="firstName"
-            rules={[{ required: true, message: "Please enter first name" }]}
-          >
-            <Input placeholder="Enter first name" className="h-[45px] rounded-md" />
-          </Form.Item>
-
-          <Form.Item
-            label="Last Name"
-            name="lastName"
-            rules={[{ required: true, message: "Please enter last name" }]}
-          >
-            <Input placeholder="Enter last name" className="h-[45px] rounded-md" />
-          </Form.Item>
-
-          <Form.Item
-            label="Email"
-            name="email"
-            rules={[
-              { required: true, message: "Please enter email" },
-              { type: "email", message: "Please enter valid email" },
-            ]}
-          >
-            <Input placeholder="Enter email" disabled={editMode} className="h-[45px] rounded-md" />
-          </Form.Item>
-
-          {/* {!editMode && (
+          <div className="grid grid-cols-2 gap-x-4">
             <Form.Item
-              label="Password"
-              name="password"
+              label="First Name"
+              name="firstName"
+              rules={[{ required: true, message: "Please enter first name" }]}
+            >
+              <Input
+                placeholder="Enter first name"
+                className="h-[45px] rounded-md"
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Last Name"
+              name="lastName"
+              rules={[{ required: true, message: "Please enter last name" }]}
+            >
+              <Input
+                placeholder="Enter last name"
+                className="h-[45px] rounded-md"
+              />
+            </Form.Item>
+
+            <Form.Item
+              label="Email"
+              name="email"
               rules={[
-                { required: true, message: "Please enter password" },
-                { min: 8, message: "Password must be at least 8 characters" },
+                { required: true, message: "Please enter email" },
+                { type: "email", message: "Please enter valid email" },
               ]}
             >
-              <Input.Password placeholder="Enter password" className="h-[45px] rounded-md" />
+              <Input
+                placeholder="Enter email"
+                disabled={editMode}
+                className="h-[45px] rounded-md"
+              />
             </Form.Item>
-          )} */}
+            <Form.Item
+              label="Phone"
+              name="phone"
+              rules={[{ required: true, message: "Please enter phone number" }]}
+            >
+              <Input
+                placeholder="Enter phone number"
+                className="h-[45px] rounded-md"
+              />
+            </Form.Item>
 
-          <Form.Item
-            label="Speciality"
-            name="speciality"
-            rules={[{ required: true, message: "Please enter speciality" }]}
-          >
-            <Input placeholder="e.g., Painting, Floor Covering, Tiles" className="h-[45px] rounded-md"  />
-          </Form.Item>
+            {!editMode && (
+              <Form.Item
+                label="Password"
+                name="password"
+                rules={[
+                  { required: true, message: "Please enter password" },
+                  { min: 8, message: "Password must be at least 8 characters" },
+                ]}
+              >
+                <Input.Password
+                  placeholder="Enter password"
+                  className="h-[45px] rounded-md"
+                />
+              </Form.Item>
+            )}
+
+            <Form.Item
+              label="Speciality"
+              name="speciality"
+              rules={[{ required: true, message: "Please enter speciality" }]}
+            >
+              <Input
+                placeholder="e.g., Painting, Floor Covering, Tiles"
+                className="h-[45px] rounded-md"
+              />
+            </Form.Item>
+          </div>
 
           <Form.Item>
             <div className="flex gap-2 justify-end">

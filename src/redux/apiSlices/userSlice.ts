@@ -31,7 +31,7 @@ const userSlice = api.injectEndpoints({
       query: (data) => {
         return {
           method: "POST",
-          url: "/users",
+          url: "/admin/artisan",
           body: data,
         };
       },
