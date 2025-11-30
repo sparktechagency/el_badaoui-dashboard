@@ -206,7 +206,6 @@ const Categories = () => {
 
     try {
       if (editingId) {
-        // ✅ Update
         await updateCategory({
           id: editingId,
           name,
@@ -214,7 +213,6 @@ const Categories = () => {
         }).unwrap();
         message.success("Category updated successfully!");
       } else {
-        // ✅ Create
         await createCategory({
           name,
           image: imageFile?.originFileObj,
@@ -314,8 +312,17 @@ const Categories = () => {
               maxCount={1}
               accept="image/*"
               beforeUpload={() => false}
-              fileList={fileList} // controlled
-              onChange={(info) => setFileList(info.fileList)}
+              fileList={fileList}
+              onChange={(info) => {
+                setFileList(info.fileList);
+
+                const file = info.fileList[0];
+                if (file && file.originFileObj) {
+                  setImageFile(file);
+                } else {
+                  setImageFile(null);
+                }
+              }}
             >
               Upload
             </Upload>

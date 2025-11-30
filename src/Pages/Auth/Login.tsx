@@ -65,7 +65,7 @@ const Login = () => {
         {/* Email Field */}
         <Form.Item
           name="email"
-          label="Email"
+          label={<p className="text-white">Email</p>}
           rules={[
             { required: true, message: "Please input your email!" },
             { type: "email", message: "Please enter a valid email!" },
@@ -74,7 +74,7 @@ const Login = () => {
           <Input
             placeholder="Enter your email address"
             style={{
-              height: 40,
+              height: 45,
               border: "1px solid #d9d9d9",
               outline: "none",
               boxShadow: "none",
@@ -85,13 +85,13 @@ const Login = () => {
         {/* Password Field */}
         <Form.Item
           name="password"
-          label={<p>Password</p>}
+          label={<p className="text-white">Password</p>}
           rules={[{ required: true, message: "Please input your password!" }]}
         >
           <Input.Password
             placeholder="Enter your password"
             style={{
-              height: 40,
+              height: 45,
               border: "1px solid #d9d9d9",
               outline: "none",
               boxShadow: "none",
@@ -101,7 +101,7 @@ const Login = () => {
 
         {/* Remember Me and Forgot Password */}
         <Form.Item style={{ marginBottom: 0 }}>
-          <div className="flex justify-between items-center">
+          <div className="flex justify-end items-center">
             {/* Remember Me Checkbox */}
             {/* <Checkbox onChange={onCheckboxChange} className="text-sm">
               Remember Me
@@ -110,7 +110,7 @@ const Login = () => {
             {/* Forgot Password Link */}
             <a
               href="/auth/forgot-password"
-              className="text-sm font-bold text-blue-500 hover:text-blue-700"
+              className="text-sm hover:font-bold text-white hover:text-white"
             >
               Forgot Password?
             </a>

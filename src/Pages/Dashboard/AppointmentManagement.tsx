@@ -1,6 +1,6 @@
 import { useGetAllAppointmentsQuery } from "@/redux/apiSlices/appointmentApi";
 import { useState } from "react";
-import { Table, Tag, Select, Spin } from "antd";
+import { Table, Tag, Select, Spin, ConfigProvider } from "antd";
 import {
   CalendarOutlined,
   ClockCircleOutlined,
@@ -156,6 +156,9 @@ const AppointmentManagement = () => {
           </div>
         </div>
 
+         <ConfigProvider
+          theme={{ components: { Table: { headerBg: "#fff4e5" } } }}
+        >
           <Table
             columns={columns}
             dataSource={data?.data || []}
@@ -171,6 +174,7 @@ const AppointmentManagement = () => {
               position: ["bottomRight"],
             }}
           />
+        </ConfigProvider>
       
       </div>
     </div>

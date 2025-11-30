@@ -10,6 +10,7 @@ import {
   Popconfirm,
   message,
   Image,
+  ConfigProvider,
 } from "antd";
 import {
   PlusOutlined,
@@ -261,21 +262,25 @@ const OurProjectsManagement = () => {
         </Button>
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={previousProjects?.data || []}
-        rowKey="_id"
-        loading={isLoading}
-        pagination={{
-          current: currentPage,
-          pageSize: perPage,
-          total: previousProjects?.pagination?.total || 0,
-          onChange: (page) => setCurrentPage(page),
-          showSizeChanger: false,
-          showTotal: (total) => `Total ${total} items`,
-        }}
-        size="small"
-      />
+     <ConfigProvider
+          theme={{ components: { Table: { headerBg: "#fff4e5" } } }}
+        >
+          <Table
+            columns={columns}
+            dataSource={previousProjects?.data || []}
+            rowKey="_id"
+            loading={isLoading}
+            pagination={{
+              current: currentPage,
+              pageSize: perPage,
+              total: previousProjects?.pagination?.total || 0,
+              onChange: (page) => setCurrentPage(page),
+              showSizeChanger: false,
+              showTotal: (total) => `Total ${total} items`,
+            }}
+            size="small"
+          />
+        </ConfigProvider>
 
       <Modal
         title={editingProject ? "Edit Project" : "Add New Projects"}
