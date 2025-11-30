@@ -1,18 +1,28 @@
-import { useSingleProjectManagementQuery, useUpdateProjectManagementMutation } from "@/redux/apiSlices/projectManagementApi";
-import { Button, Tag, Descriptions, Spin, Select, InputNumber, message, Modal } from "antd";
+import {
+  useSingleProjectManagementQuery,
+  useUpdateProjectManagementMutation,
+} from "@/redux/apiSlices/projectManagementApi";
+import {
+  Button,
+  Tag,
+  Descriptions,
+  Spin,
+  Select,
+  InputNumber,
+  message,
+  Modal,
+} from "antd";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useGetAllArtisanQuery } from "@/redux/apiSlices/projectManagementApi";
-
 
 type Status = "NEW" | "COMPLETED" | "ACCEPTED";
 
 const statusColor: Record<Status, string> = {
   ACCEPTED: "#14b8a6",
-  COMPLETED: "#f59e0b",
-  NEW: "#3b82f6",
+  COMPLETED:"#3b82f6",
+  NEW:  "#f59e0b",
 };
-
 
 const statusOptions = [
   { label: "New", value: "NEW" as const },
@@ -28,9 +38,11 @@ const ProjectManagementDetails = () => {
   const { data, isLoading } = useSingleProjectManagementQuery(id || "", {
     skip: !id,
   });
-  
-  const [updateProject, { isLoading: isUpdating }] = useUpdateProjectManagementMutation();
-  const { data: artisanData, isLoading: isArtisanLoading } = useGetAllArtisanQuery(null);
+
+  const [updateProject, { isLoading: isUpdating }] =
+    useUpdateProjectManagementMutation();
+  const { data: artisanData, isLoading: isArtisanLoading } =
+    useGetAllArtisanQuery(null);
   console.log(artisanData);
 
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
@@ -39,7 +51,9 @@ const ProjectManagementDetails = () => {
   const [selectedStatus, setSelectedStatus] = useState<Status | undefined>();
   const [totalWithoutVat, setTotalWithoutVat] = useState<number | undefined>();
   const [totalWithVat, setTotalWithVat] = useState<number | undefined>();
-  const [selectedArtisanId, setSelectedArtisanId] = useState<string | undefined>(); // NEW: Selected artisan state
+  const [selectedArtisanId, setSelectedArtisanId] = useState<
+    string | undefined
+  >(); // NEW: Selected artisan state
 
   const details = data?.data;
 
@@ -70,13 +84,13 @@ const ProjectManagementDetails = () => {
 
   const handleStatusUpdate = async () => {
     if (!id || !selectedStatus) return;
-    
+
     try {
       await updateProject({
         id,
         status: selectedStatus,
       }).unwrap();
-      
+
       message.success("Status updated successfully");
       setIsStatusModalOpen(false);
     } catch (error) {
@@ -86,22 +100,23 @@ const ProjectManagementDetails = () => {
 
   const handleVatUpdate = async () => {
     if (!id) return;
-    
+
     const updateData: any = {};
-    if (totalWithoutVat !== undefined) updateData.totalWithoutVat = totalWithoutVat;
+    if (totalWithoutVat !== undefined)
+      updateData.totalWithoutVat = totalWithoutVat;
     if (totalWithVat !== undefined) updateData.totalWithVat = totalWithVat;
-    
+
     if (Object.keys(updateData).length === 0) {
       message.warning("Please enter at least one value");
       return;
     }
-    
+
     try {
       await updateProject({
         id,
         ...updateData,
       }).unwrap();
-      
+
       message.success("Values updated successfully");
       setIsVatModalOpen(false);
       setTotalWithoutVat(undefined);
@@ -117,13 +132,13 @@ const ProjectManagementDetails = () => {
       message.warning("Please select an artisan");
       return;
     }
-    
+
     try {
       await updateProject({
         id,
         artisanId: selectedArtisanId,
       }).unwrap();
-      
+
       message.success("Artisan assigned successfully");
       setIsArtisanModalOpen(false);
       setSelectedArtisanId(undefined);
@@ -133,10 +148,11 @@ const ProjectManagementDetails = () => {
   };
 
   // NEW: Prepare artisan options for dropdown
-  const artisanOptions = artisanData?.data?.map((artisan: any) => ({
-    label: `${artisan.firstName} ${artisan.lastName}`,
-    value: artisan._id,
-  })) || [];
+  const artisanOptions =
+    artisanData?.data?.map((artisan: any) => ({
+      label: `${artisan.firstName} ${artisan.lastName}`,
+      value: artisan._id,
+    })) || [];
 
   if (isLoading) {
     return (
@@ -148,9 +164,7 @@ const ProjectManagementDetails = () => {
 
   if (!details) {
     return (
-      <div className="text-center py-8 text-gray-500">
-        Project not found
-      </div>
+      <div className="text-center py-8 text-gray-500">Project not found</div>
     );
   }
 
@@ -168,13 +182,17 @@ const ProjectManagementDetails = () => {
           </h1>
         </div>
         <div className="flex items-center gap-3">
-          <Button type="default" onClick={openStatusModal} className="py-[22px]">
+          <Button
+            type="default"
+            onClick={openStatusModal}
+            className="py-[22px]"
+          >
             Update Status
           </Button>
           <Button type="default" onClick={openVatModal} className="py-[22px]">
             Update Values
           </Button>
-          <Button 
+          <Button
             type="default"
             onClick={() => {
               if (details?.email) {
@@ -197,7 +215,9 @@ const ProjectManagementDetails = () => {
             <div>
               <div className="text-sm text-gray-600">Total Without VAT</div>
               <div className="text-base font-semibold">
-                {details.totalWithoutVat ? currency(details.totalWithoutVat) : "—"}
+                {details.totalWithoutVat
+                  ? currency(details.totalWithoutVat)
+                  : "—"}
               </div>
             </div>
             <div>
@@ -243,7 +263,10 @@ const ProjectManagementDetails = () => {
                 {details.email}
               </Descriptions.Item>
               <Descriptions.Item label="Status">
-                <Tag color={statusColor[details.status as Status]} style={{ color: "#fff" }}>
+                <Tag
+                  color={statusColor[details.status as Status]}
+                  style={{ color: "#fff" }}
+                >
                   {details.status}
                 </Tag>
               </Descriptions.Item>
@@ -257,9 +280,9 @@ const ProjectManagementDetails = () => {
             <h3 className="text-lg font-semibold text-[#210630]">
               Artisan: {artisanName}
             </h3>
-            <Button 
-              // type="primary" 
-              size="small" 
+            <Button
+              // type="primary"
+              size="small"
               onClick={openArtisanModal}
               loading={isArtisanLoading}
               className="py-[16px] bg-[#3f51b5] text-white"
@@ -270,8 +293,10 @@ const ProjectManagementDetails = () => {
           <div className="mt-3 space-y-2 text-sm text-gray-700">
             {details.artisanId ? (
               <>
-                <div>ID: {details.artisanId._id.slice(-6)}</div>
+                {/* <div>ID: {details.artisanId._id.slice(-6)}</div> */}
                 <div>Name: {artisanName}</div>
+                <div>Email: {details.artisanId?.email}</div>
+                {/* <div>Phone: {details.artisanId?.phone || "N/A"}</div> */}
               </>
             ) : (
               <div>No artisan assigned</div>
@@ -279,6 +304,23 @@ const ProjectManagementDetails = () => {
           </div>
         </div>
       </div>
+
+      {details?.quote && (
+        <div>
+          <Button
+            onClick={() => {
+              const pdfUrl = details.quote[0]?.pdfUrl;
+              const fullUrl = `${
+                import.meta.env.VITE_API_BASE_URL || ""
+              }${pdfUrl}`;
+              window.open(fullUrl, "_blank");
+            }}
+            className="bg-[#3f51b5] text-white py-[22px]  rounded-md"
+          >
+            View Estimate PDF
+          </Button>
+        </div>
+      )}
 
       {/* Status Update Modal */}
       <Modal
@@ -292,7 +334,9 @@ const ProjectManagementDetails = () => {
         confirmLoading={isUpdating}
       >
         <div className="py-4">
-          <label className="block text-sm font-medium mb-2">Select Status</label>
+          <label className="block text-sm font-medium mb-2">
+            Select Status
+          </label>
           <Select
             className="w-full"
             value={selectedStatus}
@@ -301,7 +345,10 @@ const ProjectManagementDetails = () => {
             placeholder="Choose new status"
           />
           <div className="mt-2 text-xs text-gray-500">
-            Current status: <Tag color={statusColor[(details?.status as Status) || "NEW"]}>{details?.status}</Tag>
+            Current status:{" "}
+            <Tag color={statusColor[(details?.status as Status) || "NEW"]}>
+              {details?.status}
+            </Tag>
           </div>
         </div>
       </Modal>
@@ -332,7 +379,10 @@ const ProjectManagementDetails = () => {
               prefix="€"
             />
             <div className="mt-1 text-xs text-gray-500">
-              Current: {details?.totalWithoutVat ? currency(details.totalWithoutVat) : "Not set"}
+              Current:{" "}
+              {details?.totalWithoutVat
+                ? currency(details.totalWithoutVat)
+                : "Not set"}
             </div>
           </div>
           <div>
@@ -364,12 +414,16 @@ const ProjectManagementDetails = () => {
           setSelectedArtisanId(undefined);
         }}
         confirmLoading={isUpdating}
-        okButtonProps={{ style: { backgroundColor: "#3f51b5", color: "#fff", height: "40px" } }}
+        okButtonProps={{
+          style: { backgroundColor: "#3f51b5", color: "#fff", height: "40px" },
+        }}
         cancelButtonProps={{ style: { height: "40px" } }}
         okText="Assign"
       >
         <div className="py-4">
-          <label className="block text-sm font-medium mb-2">Select Artisan</label>
+          <label className="block text-sm font-medium mb-2">
+            Select Artisan
+          </label>
           <Select
             className="w-full h-12"
             value={selectedArtisanId}
@@ -379,9 +433,10 @@ const ProjectManagementDetails = () => {
             loading={isArtisanLoading}
             showSearch
             filterOption={(input, option) =>
-              String(option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              String(option?.label ?? "")
+                .toLowerCase()
+                .includes(input.toLowerCase())
             }
-           
           />
           <div className="mt-2 text-xs text-gray-500">
             Current artisan: <span className="font-medium">{artisanName}</span>

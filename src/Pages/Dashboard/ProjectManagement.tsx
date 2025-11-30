@@ -24,8 +24,8 @@ type Project = {
 
 const statusColor: Record<Project["status"], string> = {
   ACCEPTED: "#14b8a6",
-  COMPLETED: "#f59e0b",
-  NEW: "#3b82f6",
+  COMPLETED:"#3b82f6",
+  NEW:  "#f59e0b",
 };
 
 const statusOptions = [
