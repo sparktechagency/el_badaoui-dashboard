@@ -403,7 +403,9 @@ const OurProjectsManagement = () => {
               ]}
             >
               <Upload {...afterImageUploadProps}>
-                <Button icon={<UploadOutlined />} className="h-[44px]">Select After Image</Button>
+                <Button icon={<UploadOutlined />} className="h-[44px]">
+                  Select After Image
+                </Button>
               </Upload>
             </Form.Item>
             <Form.Item
@@ -421,7 +423,9 @@ const OurProjectsManagement = () => {
               ]}
             >
               <Upload {...beforeImageUploadProps}>
-                <Button icon={<UploadOutlined />} className="h-[44px]">Select Before Image</Button>
+                <Button icon={<UploadOutlined />} className="h-[44px]">
+                  Select Before Image
+                </Button>
               </Upload>
             </Form.Item>
           </div>
@@ -458,44 +462,46 @@ const OurProjectsManagement = () => {
         open={isViewModalVisible}
         onCancel={handleCloseViewModal}
         footer={null}
-        width={700}
+        width={870}
       >
         {viewingProject && (
           <div>
-            <div style={{ marginBottom: "16px" }}>
-              <div style={{ marginBottom: "8px", fontWeight: "bold" }}>
-                After Image:
+            <div className="flex justify-between items-center">
+              <div style={{ marginBottom: "16px" }}>
+                <div style={{ marginBottom: "8px", fontWeight: "bold" }}>
+                  After Image:
+                </div>
+                <Image
+                  src={`${import.meta.env.VITE_API_BASE_URL || ""}${
+                    viewingProject.afterImage
+                  }`}
+                  alt="After"
+                  style={{
+                    width: "400px",
+                    height: "300px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                  }}
+                />
               </div>
-              <Image
-                src={`${import.meta.env.VITE_API_BASE_URL || ""}${
-                  viewingProject.afterImage
-                }`}
-                alt="After"
-                style={{
-                  width: "650px",
-                  maxHeight: "370px",
-                  objectFit: "cover",
-                  borderRadius: "8px",
-                }}
-              />
-            </div>
 
-            <div style={{ marginBottom: "16px" }}>
-              <div style={{ marginBottom: "8px", fontWeight: "bold" }}>
-                Before Image:
+              <div style={{ marginBottom: "16px" }}>
+                <div style={{ marginBottom: "8px", fontWeight: "bold" }}>
+                  Before Image:
+                </div>
+                <Image
+                  src={`${import.meta.env.VITE_API_BASE_URL || ""}${
+                    viewingProject.beforeImage
+                  }`}
+                  alt="Before"
+                  style={{
+                    width: "400px",
+                    height: "300px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                  }}
+                />
               </div>
-              <Image
-                src={`${import.meta.env.VITE_API_BASE_URL || ""}${
-                  viewingProject.beforeImage
-                }`}
-                alt="Before"
-                style={{
-                  width: "650px",
-                  maxHeight: "370px",
-                  objectFit: "cover",
-                  borderRadius: "8px",
-                }}
-              />
             </div>
 
             <div style={{ marginBottom: "16px" }}>
