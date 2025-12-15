@@ -46,7 +46,7 @@ const AppointmentManagement = () => {
       render: (_: any, record: any) => (
         <div>
           <UserOutlined style={{ marginRight: 8 }} />
-          {record.customerId?.firstName || "N/A"}
+          {record?.firstName || "N/A"}
         </div>
       ),
     },
@@ -57,11 +57,11 @@ const AppointmentManagement = () => {
         <div>
           <div>
             <MailOutlined style={{ marginRight: 8 }} />
-            {record.customerId?.email || "N/A"}
+            {record?.email || "N/A"}
           </div>
-          <div style={{ color: "#8c8c8c", marginTop: 4 }}>
+          <div style={{  marginTop: 4 }}>
             <PhoneOutlined style={{ marginRight: 8 }} />
-            {record.customerId?.phone || "N/A"}
+            {record?.phone || "N/A"}
           </div>
         </div>
       ),

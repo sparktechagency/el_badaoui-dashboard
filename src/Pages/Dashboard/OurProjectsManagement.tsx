@@ -31,7 +31,9 @@ interface Project {
   _id: string;
   title: string;
   description: string;
-  image: string;
+  afterImage: string;
+  beforeImage: string;
+  videoLink?: string;
 }
 
 const OurProjectsManagement = () => {
@@ -42,7 +44,8 @@ const OurProjectsManagement = () => {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [viewingProject, setViewingProject] = useState<Project | null>(null);
   const [form] = Form.useForm();
-  const [fileList, setFileList] = useState<any[]>([]);
+  const [afterImageFileList, setAfterImageFileList] = useState<any[]>([]);
+  const [beforeImageFileList, setBeforeImageFileList] = useState<any[]>([]);
 
   const queryParams = [
     { name: "page", value: currentPage.toString() },
@@ -64,19 +67,33 @@ const OurProjectsManagement = () => {
       form.setFieldsValue({
         title: project.title,
         description: project.description,
+        videoLink: project.videoLink || "",
       });
-      setFileList([
+
+      // Set after image
+      setAfterImageFileList([
         {
-          uid: project._id,
-          name: project.title,
+          uid: project._id + "-after",
+          name: "After Image",
           status: "done",
-          url: `${import.meta.env.VITE_API_BASE_URL}${project.image}`, // full URL
+          url: `${import.meta.env.VITE_API_BASE_URL}${project.afterImage}`,
+        },
+      ]);
+
+      // Set before image
+      setBeforeImageFileList([
+        {
+          uid: project._id + "-before",
+          name: "Before Image",
+          status: "done",
+          url: `${import.meta.env.VITE_API_BASE_URL}${project.beforeImage}`,
         },
       ]);
     } else {
       setEditingProject(null);
       form.resetFields();
-      setFileList([]);
+      setAfterImageFileList([]);
+      setBeforeImageFileList([]);
     }
     setIsModalVisible(true);
   };
@@ -85,7 +102,8 @@ const OurProjectsManagement = () => {
     setIsModalVisible(false);
     setEditingProject(null);
     form.resetFields();
-    setFileList([]);
+    setAfterImageFileList([]);
+    setBeforeImageFileList([]);
   };
 
   const handleOpenViewModal = (project: Project) => {
@@ -104,11 +122,27 @@ const OurProjectsManagement = () => {
       formData.append("title", values.title);
       formData.append("description", values.description);
 
-      // শুধুমাত্র নতুন ফাইল আপলোড করা হলে image append করুন
-      if (fileList.length > 0 && fileList[0].originFileObj) {
-        formData.append("image", fileList[0].originFileObj);
+      // Add video link if provided
+      if (values.videoLink) {
+        formData.append("video", values.videoLink);
       }
 
+      // Add after image
+      if (
+        afterImageFileList.length > 0 &&
+        afterImageFileList[0].originFileObj
+      ) {
+        formData.append("afterImage", afterImageFileList[0].originFileObj);
+      }
+
+      // Add before image
+      if (
+        beforeImageFileList.length > 0 &&
+        beforeImageFileList[0].originFileObj
+      ) {
+        formData.append("beforeImage", beforeImageFileList[0].originFileObj);
+      }
+      console.log(formData);
       if (editingProject) {
         await updateProject({
           id: editingProject._id,
@@ -146,14 +180,29 @@ const OurProjectsManagement = () => {
       render: (_, __, index) => index + 1,
     },
     {
-      title: "Image",
-      dataIndex: "image",
-      key: "image",
+      title: "After Image",
+      dataIndex: "afterImage",
+      key: "afterImage",
       width: 150,
       render: (image: string) => (
         <Image
           src={`${import.meta.env.VITE_API_BASE_URL || ""}${image}`}
-          alt="Project"
+          alt="After"
+          width={120}
+          height={60}
+          style={{ objectFit: "cover", borderRadius: 4 }}
+        />
+      ),
+    },
+    {
+      title: "Before Image",
+      dataIndex: "beforeImage",
+      key: "beforeImage",
+      width: 150,
+      render: (image: string) => (
+        <Image
+          src={`${import.meta.env.VITE_API_BASE_URL || ""}${image}`}
+          alt="Before"
           width={120}
           height={60}
           style={{ objectFit: "cover", borderRadius: 4 }}
@@ -169,7 +218,6 @@ const OurProjectsManagement = () => {
       title: "Description",
       dataIndex: "description",
       key: "description",
-      //   ellipsis: true,
       render: (text: string) => (
         <span>{text.length > 50 ? `${text.slice(0, 50)}...` : text}</span>
       ),
@@ -177,7 +225,6 @@ const OurProjectsManagement = () => {
     {
       title: "Action",
       key: "action",
-      //   width: 200,
       render: (_, record) => (
         <Space size="small">
           <Button
@@ -212,8 +259,8 @@ const OurProjectsManagement = () => {
     },
   ];
 
-  const uploadProps = {
-    fileList,
+  const afterImageUploadProps = {
+    fileList: afterImageFileList,
     beforeUpload: (file: File) => {
       const isImage = file.type.startsWith("image/");
       if (!isImage) {
@@ -221,7 +268,7 @@ const OurProjectsManagement = () => {
         return Upload.LIST_IGNORE;
       }
 
-      setFileList([
+      setAfterImageFileList([
         {
           uid: file.name,
           name: file.name,
@@ -234,10 +281,38 @@ const OurProjectsManagement = () => {
       return false;
     },
     onRemove: () => {
-      setFileList([]);
+      setAfterImageFileList([]);
     },
     maxCount: 1,
-    listType: "picture",
+    listType: "picture" as const,
+  };
+
+  const beforeImageUploadProps = {
+    fileList: beforeImageFileList,
+    beforeUpload: (file: File) => {
+      const isImage = file.type.startsWith("image/");
+      if (!isImage) {
+        message.error("You can only upload image files!");
+        return Upload.LIST_IGNORE;
+      }
+
+      setBeforeImageFileList([
+        {
+          uid: file.name,
+          name: file.name,
+          status: "done",
+          originFileObj: file,
+          url: URL.createObjectURL(file),
+        },
+      ]);
+
+      return false;
+    },
+    onRemove: () => {
+      setBeforeImageFileList([]);
+    },
+    maxCount: 1,
+    listType: "picture" as const,
   };
 
   return (
@@ -262,25 +337,25 @@ const OurProjectsManagement = () => {
         </Button>
       </div>
 
-     <ConfigProvider
-          theme={{ components: { Table: { headerBg: "#fff4e5" } } }}
-        >
-          <Table
-            columns={columns}
-            dataSource={previousProjects?.data || []}
-            rowKey="_id"
-            loading={isLoading}
-            pagination={{
-              current: currentPage,
-              pageSize: perPage,
-              total: previousProjects?.pagination?.total || 0,
-              onChange: (page) => setCurrentPage(page),
-              showSizeChanger: false,
-              showTotal: (total) => `Total ${total} items`,
-            }}
-            size="small"
-          />
-        </ConfigProvider>
+      <ConfigProvider
+        theme={{ components: { Table: { headerBg: "#fff4e5" } } }}
+      >
+        <Table
+          columns={columns}
+          dataSource={previousProjects?.data || []}
+          rowKey="_id"
+          loading={isLoading}
+          pagination={{
+            current: currentPage,
+            pageSize: perPage,
+            total: previousProjects?.pagination?.total || 0,
+            onChange: (page) => setCurrentPage(page),
+            showSizeChanger: false,
+            showTotal: (total) => `Total ${total} items`,
+          }}
+          size="small"
+        />
+      </ConfigProvider>
 
       <Modal
         title={editingProject ? "Edit Project" : "Add New Projects"}
@@ -297,7 +372,7 @@ const OurProjectsManagement = () => {
               { required: true, message: "Please input the project name!" },
             ]}
           >
-            <Input placeholder="Interior painting" />
+            <Input placeholder="Interior painting" className="h-[44px]" />
           </Form.Item>
 
           <Form.Item
@@ -313,41 +388,65 @@ const OurProjectsManagement = () => {
             />
           </Form.Item>
 
-          <Form.Item
-            label="Upload Image"
-            name="image"
-            rules={[
-              {
-                validator: () =>
-                  fileList || editingProject
-                    ? Promise.resolve()
-                    : Promise.reject(new Error("Please upload an image!")),
-              },
-            ]}
-          >
-            <Upload {...uploadProps} listType="picture">
-              <Button icon={<UploadOutlined />}>Select Files</Button>
-            </Upload>
-            {/* <div style={{ color: "#888", fontSize: "12px", marginTop: "8px" }}>
-              Photos, Jpg, Png... Drag and drop or click to upload
-            </div> */}
+          <div className="flex justify-between items-center">
+            {" "}
+            <Form.Item
+              label="After Image"
+              name="afterImage"
+              rules={[
+                {
+                  validator: () =>
+                    afterImageFileList.length > 0 || editingProject
+                      ? Promise.resolve()
+                      : Promise.reject(new Error("Please upload after image!")),
+                },
+              ]}
+            >
+              <Upload {...afterImageUploadProps}>
+                <Button icon={<UploadOutlined />} className="h-[44px]">Select After Image</Button>
+              </Upload>
+            </Form.Item>
+            <Form.Item
+              label="Before Image"
+              name="beforeImage"
+              rules={[
+                {
+                  validator: () =>
+                    beforeImageFileList.length > 0 || editingProject
+                      ? Promise.resolve()
+                      : Promise.reject(
+                          new Error("Please upload before image!")
+                        ),
+                },
+              ]}
+            >
+              <Upload {...beforeImageUploadProps}>
+                <Button icon={<UploadOutlined />} className="h-[44px]">Select Before Image</Button>
+              </Upload>
+            </Form.Item>
+          </div>
+
+          <Form.Item label="Video Link (Optional)" name="videoLink">
+            <Input
+              placeholder="https://www.youtube.com/watch?v=..."
+              className="h-[44px]"
+            />
           </Form.Item>
 
           <Form.Item style={{ marginBottom: 0, textAlign: "right" }}>
             <Space>
               <Button
                 onClick={handleCloseModal}
-                className="py-[20px]  text-black"
+                className="py-[20px] text-black"
               >
                 Cancel
               </Button>
               <Button
-                // type="primary"
                 htmlType="submit"
                 loading={isCreating || isUpdating}
                 className="py-[20px] bg-[#3f51b5] text-white"
               >
-                {editingProject ? "Update" : "Save Category"}
+                {editingProject ? "Update" : "Save Project"}
               </Button>
             </Space>
           </Form.Item>
@@ -358,61 +457,81 @@ const OurProjectsManagement = () => {
         title="View Project"
         open={isViewModalVisible}
         onCancel={handleCloseViewModal}
-        // footer={[
-        //   <Button key="close" onClick={handleCloseViewModal}>
-        //     Close
-        //   </Button>,
-        //   <Button
-        //     key="edit"
-        //     type="primary"
-        //     icon={<EditOutlined />}
-        //     onClick={handleEditFromView}
-        //   >
-        //     Edit Project
-        //   </Button>,
-        // ]}
         footer={null}
         width={700}
       >
         {viewingProject && (
           <div>
             <div style={{ marginBottom: "16px" }}>
+              <div style={{ marginBottom: "8px", fontWeight: "bold" }}>
+                After Image:
+              </div>
               <Image
                 src={`${import.meta.env.VITE_API_BASE_URL || ""}${
-                  viewingProject.image
+                  viewingProject.afterImage
                 }`}
-                alt={viewingProject.title}
+                alt="After"
                 style={{
                   width: "650px",
                   maxHeight: "370px",
                   objectFit: "cover",
                   borderRadius: "8px",
-                  //   margin: "0 auto",
                 }}
               />
             </div>
+
             <div style={{ marginBottom: "16px" }}>
-              Project Name:
-              <span style={{ fontSize: "16px", fontWeight: "bold" }}>
-                {viewingProject.title}
-              </span>
+              <div style={{ marginBottom: "8px", fontWeight: "bold" }}>
+                Before Image:
+              </div>
+              <Image
+                src={`${import.meta.env.VITE_API_BASE_URL || ""}${
+                  viewingProject.beforeImage
+                }`}
+                alt="Before"
+                style={{
+                  width: "650px",
+                  maxHeight: "370px",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                }}
+              />
             </div>
-            <div>
+
+            <div style={{ marginBottom: "16px" }}>
+              <span style={{ fontWeight: "bold" }}>Project Name: </span>
+              <span style={{ fontSize: "16px" }}>{viewingProject.title}</span>
+            </div>
+
+            <div style={{ marginBottom: "16px" }}>
               <span style={{ fontSize: "14px", fontWeight: "bold" }}>
-                {" "}
                 Description:{" "}
               </span>
-
               <span
                 style={{
                   fontSize: "14px",
-
                   lineHeight: "1.6",
                 }}
               >
                 {viewingProject.description}
               </span>
             </div>
+
+            {viewingProject.videoLink && (
+              <div>
+                <span style={{ fontSize: "14px", fontWeight: "bold" }}>
+                  Video Link:{" "}
+                </span>
+                <a
+                  href={viewingProject.videoLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "#1890ff" }}
+                >
+                  {viewingProject.videoLink}
+                </a>
+              </div>
+            )}
           </div>
         )}
       </Modal>
