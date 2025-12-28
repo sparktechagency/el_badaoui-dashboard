@@ -19,7 +19,7 @@ const EstimateAnalytics = () => {
   // dynamic year list: previous 4 years + current + next 1 year
   const yearOptions = useMemo(() => {
     const years = [];
-    for (let i = currentYear - 4; i <= currentYear + 1; i++) {
+    for (let i = currentYear - 4; i <= currentYear + 4; i++) {
       years.push(i);
     }
     return years;

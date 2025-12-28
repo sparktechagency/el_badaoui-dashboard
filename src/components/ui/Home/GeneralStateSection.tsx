@@ -35,7 +35,7 @@ const GeneralStateSection = () => {
     {
       title: "Total Estimate projects",
       value: data?.data?.totalProjects ?? 0,
-      prefix: "+",
+      prefix: "",
       icon: BiBarChartAlt2,
       main: "#3f51b5",
       light: "#c7d2fe",
@@ -43,7 +43,7 @@ const GeneralStateSection = () => {
     {
       title: "Active Projects",
       value: data?.data?.activeProjects ?? 0,
-      prefix: "+",
+      prefix: "",
       icon: RiCalendarTodoFill,
       main: "#f59e0b",
       light: "#fde68a",
@@ -51,7 +51,7 @@ const GeneralStateSection = () => {
     {
       title: "Total Users",
       value: data?.data?.totalUsers ?? 0,
-      prefix: "+ ",
+      prefix: " ",
       icon: FaUsers,
       main: "#facc15",
       light: "#fef08a",
@@ -88,7 +88,7 @@ const GeneralStateSection = () => {
             key={c.title}
             className="relative bg-white rounded-2xl px-6 py-4 shadow-sm ring-1 ring-black/5 overflow-hidden"
           >
-            <div className="flex items-start justify-between">
+            <div className="flex items-center justify-between">
               <span className="text-[13px] font-medium text-gray-600">{c.title}</span>
               <span
                 className="rounded-md p-2"
@@ -98,7 +98,7 @@ const GeneralStateSection = () => {
               </span>
             </div>
             <div className="mt-2">
-              <span className="text-2xl font-semibold" style={{ color: c.main }}>
+              <span className="text-2xl font-semibold text-center" style={{ color: c.main }}>
                 {number}
               </span>
             </div>
