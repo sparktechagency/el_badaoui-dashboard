@@ -2,12 +2,12 @@ import { Menu } from "antd";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { IoIosLogOut } from "react-icons/io";
-import { IoSettingsOutline } from "react-icons/io5";
+import { IoCalendar, IoSettingsOutline } from "react-icons/io5";
 import { AiFillProject } from "react-icons/ai";
 import Cookies from "js-cookie";
 import logo from "../../assets/logo.png";
 import { FaUsers } from "react-icons/fa6";
-import { RiDashboardHorizontalFill } from "react-icons/ri";
+import { RiDashboardHorizontalFill,  RiProjectorLine } from "react-icons/ri";
 import { BiSolidCategory } from "react-icons/bi";
 
 interface MenuItem {
@@ -46,12 +46,12 @@ const Sidebar = () => {
     {
       key: "/project-management",
       icon: <AiFillProject size={24} />,
-      label: <Link to="/project-management">Project Management</Link>,
+      label: <Link to="/project-management">Project</Link>,
     },
     {
       key: "service-management",
       icon: <BiSolidCategory size={24} />,
-      label: "Service Management",
+      label: "Service",
       children: [
         {
           key: "/service-management/categories",
@@ -79,6 +79,16 @@ const Sidebar = () => {
     },
 
     {
+      key: "/appointment",
+      icon: <IoCalendar size={24} />,
+      label: <Link to="/appointment">Appointment</Link>,
+    },
+    {
+      key: "/our-projects",
+      icon: <RiProjectorLine size={24} />,
+      label: <Link to="/our-projects">Our Projects</Link>,
+    },
+    {
       key: "/users",
       icon: <FaUsers size={24} />,
       label: <Link to="/users">Users</Link>,
@@ -95,7 +105,7 @@ const Sidebar = () => {
               to="/personal-information"
               className="text-white hover:text-white"
             >
-              Personal Information
+              Personal Info
             </Link>
           ),
         },
@@ -108,14 +118,14 @@ const Sidebar = () => {
           ),
         },
 
-        {
-          key: "/about-us",
-          label: (
-            <Link to="/about-us" className="text-white hover:text-white">
-              About Us
-            </Link>
-          ),
-        },
+        // {
+        //   key: "/about-us",
+        //   label: (
+        //     <Link to="/about-us" className="text-white hover:text-white">
+        //       About Us
+        //     </Link>
+        //   ),
+        // },
         {
           key: "/terms-and-condition",
           label: (
@@ -123,7 +133,7 @@ const Sidebar = () => {
               to="/terms-and-condition"
               className="text-white hover:text-white"
             >
-              Terms And Condition
+              Terms & Conditions
             </Link>
           ),
         },
@@ -136,10 +146,10 @@ const Sidebar = () => {
           ),
         },
         {
-          key: "/f-a-q",
+          key: "/available-time",
           label: (
-            <Link to="/f-a-q" className="text-white hover:text-white">
-              FAQ
+            <Link to="/available-time" className="text-white hover:text-white">
+            Available Time
             </Link>
           ),
         },

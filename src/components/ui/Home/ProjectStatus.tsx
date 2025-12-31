@@ -1,11 +1,5 @@
+import { useProjectStatusFunnelQuery } from "@/redux/apiSlices/dashboardSlice";
 import { Pie, PieChart, Tooltip, ResponsiveContainer } from "recharts";
-
-const chartData = [
-  { name: "Accepted", value: 60, fill: "#14b8a6" },
-  { name: "Pending Signature", value: 25, fill: "#f59e0b" },
-  { name: "Drafting", value: 12, fill: "#a78bfa" },
-  { name: "New Inquiry", value: 3, fill: "#3b82f6" },
-];
 
 const LegendItem = ({ color, label }: { color: string; label: string }) => (
   <div className="flex items-center gap-3">
@@ -18,13 +12,27 @@ const LegendItem = ({ color, label }: { color: string; label: string }) => (
 );
 
 const ProjectStatus = () => {
+  const { data } = useProjectStatusFunnelQuery(null);
+  console.log("Project Status Funnel", data);
+
+  // Protect against null/undefined
+  const status = data?.data || {};
+
+  // Convert API data to chart format
+  const chartData = [
+    { name: "Projet en cours", value: status.accepted || 0, fill: "#14b8a6" },
+    { name: "Projet terminé ", value: status.completed || 0, fill: "#3b82f6" },
+    { name: "Estimé", value: status.new || 0, fill: "#f59e0b" },
+  ];
+
   return (
     <div className="bg-white rounded-2xl p-4 shadow-sm h-full">
       <div className="text-center md:text-left">
         <h4 className="mb-5 mt-4 text-xl font-semibold">
-          Project Status Funnel
+        Répartitions des Estimations
         </h4>
       </div>
+
       <div className="mt-2">
         <ResponsiveContainer width="100%" height={185}>
           <PieChart>
@@ -43,14 +51,14 @@ const ProjectStatus = () => {
           </PieChart>
         </ResponsiveContainer>
       </div>
+
       <div className="mt-4 flex items-center justify-center gap-10">
         <div className="space-y-3">
-          <LegendItem color="#14b8a6" label="Accepted" />
-          <LegendItem color="#f59e0b" label="Pending Signature" />
+          <LegendItem color="#14b8a6" label="Projet en cours" />
+          <LegendItem color="#3b82f6" label="Projet terminé " />
         </div>
         <div className="space-y-3">
-          <LegendItem color="#a78bfa" label="Drafting" />
-          <LegendItem color="#3b82f6" label="New Inquiry" />
+          <LegendItem color="#f59e0b" label="Estimé" />
         </div>
       </div>
     </div>

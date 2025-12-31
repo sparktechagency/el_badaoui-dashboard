@@ -8,90 +8,73 @@ import {
   Tag,
   ConfigProvider,
   Input,
-  Select,
+  Upload,
   InputNumber,
+  message,
 } from "antd";
-import type { TableProps } from "antd";
+import type { TableProps, UploadFile } from "antd";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 import { FaPlus } from "react-icons/fa6";
-
-type Category = {
-  id: string;
-  title: string;
-  image: string;
-};
+import { UploadOutlined } from "@ant-design/icons";
+import {
+  
+  useCreateSubCategoryMutation,
+  useUpdateSubCategoryMutation,
+  useDeleteSubCategoryMutation,
+} from "@/redux/apiSlices/subCategoryApi";
+import { useGetAllSubCategoriesQuery } from "@/redux/apiSlices/subCategoryApi";
 
 type SubCategory = {
-  id: string;
-  title: string;
-  categoryId: string;
-  costPerUnit: number;
-  elements: string[];
+  _id: string;
+  name: string;
+  image: string;
+  basePrice: number;
+  baseArea: number;
 };
 
-const initialCategories: Category[] = [
-  {
-    id: "cat-tiles",
-    title: "Tiles",
-    image: "https://picsum.photos/seed/tiles/80/80",
-  },
-  {
-    id: "cat-flooring",
-    title: "Flooring",
-    image: "https://picsum.photos/seed/flooring/80/80",
-  },
-  {
-    id: "cat-painting",
-    title: "Painting",
-    image: "https://picsum.photos/seed/painting/80/80",
-  },
-];
-
-const initialSubCategories: SubCategory[] = [
-  {
-    id: "sub-ceramic",
-    title: "Ceramic",
-    categoryId: "cat-tiles",
-    costPerUnit: 25,
-    elements: ["Ceiling", "Wall"],
-  },
-  {
-    id: "sub-porcelain",
-    title: "Porcelain",
-    categoryId: "cat-tiles",
-    costPerUnit: 28,
-    elements: ["Wall"],
-  },
-  {
-    id: "sub-wood",
-    title: "Wood",
-    categoryId: "cat-flooring",
-    costPerUnit: 35,
-    elements: ["Floor"],
-  },
-  {
-    id: "sub-acrylic",
-    title: "Acrylic",
-    categoryId: "cat-painting",
-    costPerUnit: 22,
-    elements: ["Wall", "Ceiling"],
-  },
-];
-
 const Subcategories = () => {
-  const categories: Category[] = initialCategories;
-  const subcategories: SubCategory[] = initialSubCategories;
+  const { data: subCategoriesData, isLoading } = useGetAllSubCategoriesQuery(null);
+  const [createSubCategory, { isLoading: isCreating }] = useCreateSubCategoryMutation();
+  const [updateSubCategory, { isLoading: isUpdating }] = useUpdateSubCategoryMutation();
+  const [deleteSubCategory] = useDeleteSubCategoryMutation();
+
   const [open, setOpen] = useState(false);
   const [form] = Form.useForm();
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+  const subcategories = subCategoriesData?.data || [];
 
   const subCategoryColumns: TableProps<SubCategory>["columns"] = [
-    { title: "Title", dataIndex: "title", key: "title" },
     {
-      title: "Category",
-      dataIndex: "categoryId",
-      key: "categoryId",
-      render: (id: string) => categories.find((c) => c.id === id)?.title ?? id,
+      title: "Image",
+      dataIndex: "image",
+      key: "image",
+      width: 100,
+      render: (image: string) => (
+        <img
+          src={`${import.meta.env.VITE_API_BASE_URL || ""}${image}`}
+          alt="subcategory"
+          className="w-16 h-16 object-cover rounded"
+        />
+      ),
+    },
+    { 
+      title: "Name", 
+      dataIndex: "name", 
+      key: "name" 
+    },
+    {
+      title: "Base Area (m²)",
+      dataIndex: "baseArea",
+      key: "baseArea",
+      render: (area: number) => `${area} m²`,
+    },
+    {
+      title: "Base Price",
+      dataIndex: "basePrice",
+      key: "basePrice",
+      render: (price: number) => `$${price}`,
     },
     {
       title: "Action",
@@ -100,19 +83,30 @@ const Subcategories = () => {
         <Space>
           <Button
             onClick={() => {
-              setEditingId(record.id);
+              setEditingId(record._id);
               form.setFieldsValue({
-                title: record.title,
-                categoryId: record.categoryId,
-                costPerUnit: record.costPerUnit,
-                elements: record.elements,
+                name: record.name,
+                baseArea: record.baseArea,
+                basePrice: record.basePrice,
               });
+              // Set existing image for preview
+              setFileList([
+                {
+                  uid: "-1",
+                  name: "current-image",
+                  status: "done",
+                  url: `${import.meta.env.VITE_API_BASE_URL || ""}${record.image}`,
+                },
+              ]);
               setOpen(true);
             }}
           >
             <FiEdit />
           </Button>
-          <Button danger disabled>
+          <Button
+            danger
+            onClick={() => handleDelete(record._id)}
+          >
             <FiTrash2 />
           </Button>
         </Space>
@@ -120,14 +114,104 @@ const Subcategories = () => {
     },
   ];
 
+  const handleDelete = async (id: string) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete this subcategory?",
+      okText: "Yes",
+      okType: "danger",
+      cancelText: "No",
+      onOk: async () => {
+        try {
+          await deleteSubCategory(id).unwrap();
+          message.success("Subcategory deleted successfully");
+        } catch (error) {
+          message.error("Failed to delete subcategory");
+        }
+      },
+    });
+  };
+
   const onAddClick = () => {
     setEditingId(null);
     form.resetFields();
+    setFileList([]);
     setOpen(true);
   };
 
-  const onSubmit = () => {
-    setOpen(false);
+  const onSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      
+      // Validate image for create operation
+      if (!editingId && fileList.length === 0) {
+        message.error("Please upload an image");
+        return;
+      }
+
+      // Check if new file is uploaded
+      const hasNewFile = fileList[0]?.originFileObj instanceof File;
+      
+      const formData = {
+        name: values.name,
+        baseArea: values.baseArea,
+        basePrice: values.basePrice,
+        image: hasNewFile ? fileList[0].originFileObj : null,
+      };
+
+      if (editingId) {
+        // For update, only send image if a new one is selected
+        await updateSubCategory({ id: editingId, ...formData }).unwrap();
+        message.success("Subcategory updated successfully");
+      } else {
+        // For create, image is required
+        if (!formData.image) {
+          message.error("Please upload an image");
+          return;
+        }
+        await createSubCategory(formData).unwrap();
+        message.success("Subcategory created successfully");
+      }
+      
+      setOpen(false);
+      form.resetFields();
+      setFileList([]);
+      setEditingId(null);
+    } catch (error: any) {
+      if (error.errorFields) {
+        message.error("Please fill in all required fields");
+      } else {
+        message.error(error?.data?.message || "Operation failed");
+      }
+    }
+  };
+
+  const uploadProps = {
+    fileList,
+    beforeUpload: (file: File) => {
+      const isImage = file.type.startsWith("image/");
+      if (!isImage) {
+        message.error("You can only upload image files!");
+        return false;
+      }
+      const isLt5M = file.size / 1024 / 1024 < 5;
+      if (!isLt5M) {
+        message.error("Image must be smaller than 5MB!");
+        return false;
+      }
+      // Create a proper UploadFile object
+      const uploadFile: UploadFile = {
+        uid: file.name,
+        name: file.name,
+        status: "done",
+        originFileObj: file as any,
+      };
+      setFileList([uploadFile]);
+      return false;
+    },
+    onRemove: () => {
+      setFileList([]);
+    },
+    maxCount: 1,
   };
 
   const header = useMemo(
@@ -152,7 +236,7 @@ const Subcategories = () => {
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold text-[#210630]">{header}</h3>
-          <Button type="primary" onClick={onAddClick}>
+          <Button type="primary" onClick={onAddClick} className="bg-[#3f51b5] text-white h-[45px]">
             <FaPlus /> Add Sub Category
           </Button>
         </div>
@@ -160,10 +244,12 @@ const Subcategories = () => {
           theme={{ components: { Table: { headerBg: "#fff4e5" } } }}
         >
           <Table<SubCategory>
-            rowKey="id"
+            rowKey="_id"
             dataSource={subcategories}
             columns={subCategoryColumns}
-            pagination={{ pageSize: 6 }}
+            pagination={{ pageSize: 10 }}
+            loading={isLoading}
+            size="small"
           />
         </ConfigProvider>
       </div>
@@ -171,81 +257,74 @@ const Subcategories = () => {
       <Modal
         open={open}
         title={editingId ? "Edit Subcategory" : "Add Subcategory"}
-        onCancel={() => setOpen(false)}
+        onCancel={() => {
+          setOpen(false);
+          form.resetFields();
+          setFileList([]);
+          setEditingId(null);
+        }}
         onOk={onSubmit}
         okText={editingId ? "Save" : "Create"}
-        width={900}
+        okButtonProps={{
+          type: "primary",
+          className: "bg-[#3f51b5] text-white h-[40px] mt-4",
+        }}
+        confirmLoading={isCreating || isUpdating}
+        width={600}
+        cancelButtonProps={{
+          className: " text-white h-[40px] text-black",
+        }}
       >
         <Form
           form={form}
           layout="vertical"
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+          className="space-y-4"
         >
-          <div className="p-4 border rounded-lg space-y-4">
-            <Form.Item name="title" label="Title" rules={[{ required: true }]}>
-              <Input placeholder="Enter title" />
-            </Form.Item>
-            <Form.Item
-              name="categoryId"
-              label="Category"
-              rules={[{ required: true }]}
-            >
-              <Select
-                placeholder="Select category"
-                options={categories.map((c) => ({
-                  label: c.title,
-                  value: c.id,
-                }))}
-              />
-            </Form.Item>
-            <Form.Item
-              name="costPerUnit"
-              label="Cost per unit (m2)"
-              rules={[{ required: true }]}
-            >
-              <InputNumber
-                min={0}
-                style={{ width: "100%" }}
-                placeholder="Enter cost"
-              />
-            </Form.Item>
-          </div>
-          <div className="p-4 border rounded-lg">
-            <Form.List name="elements" initialValue={["Ceiling", "Wall"]}>
-              {(fields, { add, remove }) => (
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="font-medium">Elements needing work</span>
-                    <Button
-                      type="dashed"
-                      onClick={() => add()}
-                      icon={<FaPlus />}
-                    >
-                      Add element
-                    </Button>
-                  </div>
-                  {fields.map((field) => (
-                    <div key={field.key} className="flex items-center gap-2">
-                      <Form.Item
-                        name={field.name}
-                        rules={[{ required: true }]}
-                        className="flex-1"
-                      >
-                        <Input placeholder="e.g., Ceiling, Wall" />
-                      </Form.Item>
-                      <Button
-                        danger
-                        type="text"
-                        icon={<FiTrash2 />}
-                        onClick={() => remove(field.name)}
-                        className="mb-5"
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </Form.List>
-          </div>
+          <Form.Item
+            name="name"
+            label="Name"
+            rules={[{ required: true, message: "Please enter name" }]}
+          >
+            <Input placeholder="Enter subcategory name" className="h-[45px]"/>
+          </Form.Item>
+
+          <Form.Item
+            label={`Image ${!editingId ? "*" : "(optional)"}`}
+            help={!editingId ? "Image is required for new subcategory" : "Upload new image to replace existing one"}
+          >
+            <Upload {...uploadProps} listType="picture">
+              <Button icon={<UploadOutlined />} className="bg-[#3f51b5] text-white h-[40px]">
+                {fileList.length > 0 ? "Change Image" : "Select Image"}
+              </Button>
+            </Upload>
+          </Form.Item>
+
+          <Form.Item
+            name="baseArea"
+            label="Base Area (m²)"
+            rules={[{ required: true, message: "Please enter base area" }]}
+          >
+            <InputNumber
+              min={0}
+              style={{ width: "100%" }}
+              placeholder="Enter base area"
+              className="h-[45px]"
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="basePrice"
+            label="Base Price"
+            rules={[{ required: true, message: "Please enter base price" }]}
+          >
+            <InputNumber
+              min={0}
+              style={{ width: "100%" }}
+              placeholder="Enter base price"
+              className="h-[45px]"
+              prefix="$"
+            />
+          </Form.Item>
         </Form>
       </Modal>
     </div>

@@ -61,15 +61,17 @@ const ChangePassword = () => {
     if (Object.keys(errors).length === 0) {
       try {
         const res = (await changePassword({
-          current_password: values.currentPassword,
-          new_password: values.newPassword,
-          confirm_password: values.confirmPassword,
+          currentPassword: values.currentPassword,
+          newPassword: values.newPassword,
+          confirmPassword: values.confirmPassword,
         }).unwrap()) as ApiResponse; // Use `.unwrap()` to get the resolved value or error
         if (res.success) {
           toast.success("Password changed successfully");
+          form.resetFields();
         } else {
           toast.error("Password change failed");
         }
+
       } catch (err) {
         console.error("Error changing password:", err);
         toast.error("An error occurred while changing the password");

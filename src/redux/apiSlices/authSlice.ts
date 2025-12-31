@@ -7,7 +7,7 @@ interface LoginData {
 
 interface OtpVerifyData {
   email: string;
-  oneTimeCode: string;
+  oneTimeCode: number;
 }
 
 interface ForgotPasswordData {
@@ -20,16 +20,18 @@ interface ResetPasswordData {
 }
 
 interface ChangePasswordData {
-  current_password: string;
-  new_password: string;
-  confirm_password: string;
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 interface UpdateProfileData {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   address: string;
   phone: string;
+  image?: File;
 }
 
 const authSlice = api.injectEndpoints({
@@ -107,12 +109,12 @@ const authSlice = api.injectEndpoints({
       },
       invalidatesTags: ["AdminData"],
     }),
-    updateAdminProfile: builder.mutation<any, UpdateProfileData>({
+    updateAdminProfile: builder.mutation<any, FormData>({
       query: (data) => {
         const token = localStorage.getItem("token");
         return {
           method: "PATCH",
-          url: "/admin/profile",
+          url: "/users/profile",
           body: data,
           headers: {
             Authorization: token ? `Bearer ${JSON.parse(token)}` : "",
@@ -143,7 +145,7 @@ const authSlice = api.injectEndpoints({
       query: () => {
         return {
           method: "GET",
-          url: "/admin/profile",
+          url: "/users/profile",
         };
       },
     }),

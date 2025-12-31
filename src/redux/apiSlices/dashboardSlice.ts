@@ -6,42 +6,46 @@ const dashboardSlice = api.injectEndpoints({
       query: () => {
         return {
           method: "GET",
-          url: "/dashboard/general-stat",
+          url: "/analytics/overview",
         };
       },
+      providesTags: ["AdminData"],
     }),
-    overAllState: builder.query({
-      query: ({ range }) => {
-        return {
-          method: "GET",
-          url: `/dashboard/overall-stat?range=${range}`,
-        };
-      },
-    }),
-
-    bestServices: builder.query({
+    projectStatusFunnel: builder.query({
       query: () => {
         return {
           method: "GET",
-          url: "/dashboard/best-services",
+          url: `/analytics/project-status`,
         };
       },
+      providesTags: ["AdminData"],
     }),
 
-    vendorsConversionData: builder.query({
+    recentProject: builder.query({
       query: () => {
         return {
           method: "GET",
-          url: "/dashboard/vendor-order-conversion-rate",
+          url: "/analytics/recent-project",
         };
       },
+      providesTags: ["AdminData"],
+    }),
+
+    totalEstimates: builder.query({
+      query: ({year}) => {
+        return {
+          method: "GET",
+          url: `/analytics/total-estimates?year=${year}`,
+        };
+      },
+      providesTags: ["AdminData"],
     }),
   }),
 });
 
 export const {
   useGeneralStatsQuery,
-  useOverAllStateQuery,
-  useBestServicesQuery,
-  useVendorsConversionDataQuery,
+  useProjectStatusFunnelQuery,
+  useRecentProjectQuery,
+  useTotalEstimatesQuery,
 } = dashboardSlice;

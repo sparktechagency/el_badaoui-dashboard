@@ -1,29 +1,53 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import JoditEditor from "jodit-react";
+import Title from "../../components/common/Title";
 import rentMeLogo from "../../assets/navLogo.png";
-import toast from "react-hot-toast";
-import Title from "@/components/common/Title";
+import { toast } from "react-hot-toast";
+import { usePrivacyPolicyQuery, useUpdatePricyPolicyMutation } from "@/redux/apiSlices/privacyPolicySlice";
 
-interface PrivacyPolicyData {
-  content: string;
-  userType: string;
-}
+
 
 const PrivacyPolicy = () => {
-  const editor = useRef<any>(null);
-  const [content, setContent] = useState<string>("");
-  const selectedTab = "user"; // Add default value
+  const editor = useRef(null);
+  const [content, setContent] = useState("");
 
-  const isLoading = false;
+  const {
+    data: privacyPolicy,
+    isLoading,
+    refetch,
+  } = usePrivacyPolicyQuery(null);
 
-  // const {
-  //   data: privacyPolicy,
-  //   isLoading,
-  //   refetch,
-  // } = usePrivacyPolicyQuery(selectedTab);
+  const [updatePrivacyPolicy] = useUpdatePricyPolicyMutation();
 
-  // const [updatePricyPolicy] = useUpdatePricyPolicyMutation();
+  const privacyPolicyData = privacyPolicy?.content;
+        
 
+  useEffect(() => {
+    if (privacyPolicyData) {
+      setContent(privacyPolicyData);
+    }
+  }, [privacyPolicyData]);
+
+  const privacyPolicyDataSave = async () => {
+    const data = {
+      type: "privacy-policy",
+      content,
+    };
+
+    try {
+      const res = await updatePrivacyPolicy(data).unwrap();
+      if (res.success) {
+        toast.success("Privacy Policy updated successfully"); 
+        refetch();
+      } else {
+        toast.error("Something went wrong");
+      }
+    } catch {
+      toast.error("Update failed");
+    }
+  };
+
+  // ✅ Loading UI AFTER hooks
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -32,47 +56,19 @@ const PrivacyPolicy = () => {
     );
   }
 
-  const privacyPolicy: { content?: string } = {};
-
-  const privacyPolicyData = privacyPolicy?.content || "";
-
-  const termsDataSave = async () => {
-    const data: PrivacyPolicyData = {
-      content: content,
-      userType: selectedTab,
-    };
-    console.log(data);
-
-    try {
-      // const res = await updatePricyPolicy(data).unwrap();
-      // if (res.success) {
-      //   toast.success("Privacy Policy updated successfully");
-      //   setContent(res.data.content);
-      //   refetch();
-      // } else {
-      //   toast.error("Something went wrong");
-      // }
-    } catch (error) {
-      console.error("Update failed:", error);
-      toast.error("Update failed. Please try again.");
-    }
-  };
-
   return (
     <div className="p-6 bg-white">
       <Title className="mb-4">Privacy Policy</Title>
 
       <JoditEditor
         ref={editor}
-        value={privacyPolicyData}
-        onChange={(newContent: string) => {
-          setContent(newContent);
-        }}
+        value={content}
+        onChange={(newContent) => setContent(newContent)}
       />
 
       <div className="flex items-center justify-center mt-5">
         <button
-          onClick={termsDataSave}
+          onClick={privacyPolicyDataSave} 
           type="submit"
           className="bg-primary text-white w-[160px] h-[42px] rounded-lg"
         >
@@ -82,5 +78,6 @@ const PrivacyPolicy = () => {
     </div>
   );
 };
+
 
 export default PrivacyPolicy;

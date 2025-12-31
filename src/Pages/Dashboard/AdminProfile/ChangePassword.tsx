@@ -1,9 +1,9 @@
 import { Form, Input } from "antd";
 
 interface ChangePasswordFormValues {
-  current_password: string;
-  new_password: string;
-  confirm_password: string;
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 const ChangePassword = () => {
@@ -23,7 +23,7 @@ const ChangePassword = () => {
         className="w-full lg:w-1/2"
       >
         <Form.Item
-          name="current_password"
+          name="currentPassword"
           label={<p className="block">Current Password</p>}
           rules={[
             {
@@ -40,9 +40,9 @@ const ChangePassword = () => {
         </Form.Item>
 
         <Form.Item
-          name="new_password"
+          name="newPassword"
           label={<p className="block">New Password</p>}
-          dependencies={["current_password"]}
+          dependencies={["currentPassword"]}
           hasFeedback
           rules={[
             {
@@ -71,9 +71,9 @@ const ChangePassword = () => {
         </Form.Item>
 
         <Form.Item
-          name="confirm_password"
+          name="confirmPassword"
           label={<p className="block">Re-Type Password</p>}
-          dependencies={["new_password"]}
+          dependencies={["newPassword"]}
           hasFeedback
           rules={[
             {

@@ -2,29 +2,50 @@ import { api } from "../api/baseApi";
 
 const userSlice = api.injectEndpoints({
   endpoints: (builder) => ({
-    admin: builder.query({
-      query: () => {
+    getAllUsers: builder.query({
+      query: (args) => {
+        const params = new URLSearchParams();
+        if(args) {
+           args.forEach((arg: { name: string; value: string }) => {
+            params.append(arg.name, arg.value);
+          });
+        }
         return {
           method: "GET",
-          url: "/user?role=ADMIN",
+          url: "/admin/users",
+          params,
         };
       },
     }),
-    users: builder.query({
-      query: () => {
+    userStatusUpdate: builder.mutation({
+      query: ({id, status}) => {
         return {
-          method: "GET",
-          url: "/user",
+          method: "PATCH",
+          url: `/admin/users/${id}/status`,
+          body: { status }, // Only send status in body, id is in URL
         };
       },
+      invalidatesTags: ["Users"], 
     }),
-    vendors: builder.query({
-      query: () => {
+    createArtisans: builder.mutation({
+      query: (data) => {
         return {
-          method: "GET",
-          url: "/user?role=VENDOR",
+          method: "POST",
+          url: "/admin/artisan",
+          body: data,
         };
       },
+      invalidatesTags: ["Users"],     
+    }),
+    updateArtisanInfo: builder.mutation({
+      query: ({ id, ...data }) => {
+        return {
+          method: "PATCH",
+          url: `/admin/artisan/${id}`,
+          body: data,
+        };
+      },
+      invalidatesTags: ["Users"],
     }),
     userById: builder.query({
       query: (id) => {
@@ -33,13 +54,25 @@ const userSlice = api.injectEndpoints({
           url: `/user/profile/${id}`,
         };
       },
+      providesTags: ["Users"],
+    }),
+    deleteUser: builder.mutation({
+      query: (id) => {
+        return {
+          method: "DELETE",
+          url: `/admin/users/${id}`,
+        };
+      },
+      invalidatesTags: ["Users"], 
     }),
   }),
 });
 
 export const {
-  useAdminQuery,
-  useUsersQuery,
-  useVendorsQuery,
+  useGetAllUsersQuery,
+  useUserStatusUpdateMutation,
+  useCreateArtisansMutation,
+  useUpdateArtisanInfoMutation,
   useUserByIdQuery,
+  useDeleteUserMutation,
 } = userSlice;

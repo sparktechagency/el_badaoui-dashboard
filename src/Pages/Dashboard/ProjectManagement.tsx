@@ -1,168 +1,197 @@
-import { Table, Tag, Button, Input, Select, ConfigProvider } from "antd";
+import { useProjectManagementQuery, useUpdateProjectManagementMutation } from "@/redux/apiSlices/projectManagementApi";
+import { Table, Button, Input, Select, ConfigProvider, Spin, message } from "antd";
 import type { TableProps } from "antd";
 import moment from "moment";
 import { FaEye } from "react-icons/fa6";
-import { Link } from "react-router-dom";
-import { useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+// import { useProjectManagementQuery, useUpdateProjectManagementMutation } from "../api/projectManagementApi";
 
 type Project = {
-  projectId: string;
-  clientName: string;
-  artisan: string;
-  status: "Accepted" | "Pending Signature" | "Drafting" | "New Inquiry";
-  estimateValue: number;
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  totalWithVat: number;
+  status: "NEW" | "COMPLETED" | "ACCEPTED";
   createdAt: string;
+  projectCode: string;
+  artisanId?: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+  };
 };
 
-const dataSource: Project[] = [
-  {
-    projectId: "1",
-    clientName: "Acme Corp",
-    artisan: "John Doe",
-    status: "Accepted",
-    estimateValue: 120000,
-    createdAt: "2025-11-01T10:30:00Z",
-  },
-  {
-    projectId: "2",
-    clientName: "Bright Homes",
-    artisan: "Sarah Lee",
-    status: "Pending Signature",
-    estimateValue: 45000,
-    createdAt: "2025-10-22T08:15:00Z",
-  },
-  {
-    projectId: "3",
-    clientName: "Global Tech",
-    artisan: "Ahmed B.",
-    status: "Drafting",
-    estimateValue: 78000,
-    createdAt: "2025-10-10T14:05:00Z",
-  },
-  {
-    projectId: "4",
-    clientName: "Urban Studio",
-    artisan: "Nadia K.",
-    status: "New Inquiry",
-    estimateValue: 15000,
-    createdAt: "2025-11-18T12:00:00Z",
-  },
-  {
-    projectId: "5",
-    clientName: "Zen Living",
-    artisan: "Omar S.",
-    status: "Accepted",
-    estimateValue: 92000,
-    createdAt: "2025-09-28T09:40:00Z",
-  },
-  {
-    projectId: "6",
-    clientName: "Eco Builders",
-    artisan: "Marta R.",
-    status: "Pending Signature",
-    estimateValue: 32000,
-    createdAt: "2025-11-12T16:25:00Z",
-  },
-  {
-    projectId: "7",
-    clientName: "Sunset Ltd",
-    artisan: "Luis F.",
-    status: "Drafting",
-    estimateValue: 51000,
-    createdAt: "2025-10-02T11:10:00Z",
-  },
-  {
-    projectId: "8",
-    clientName: "Harmony Designs",
-    artisan: "Aisha T.",
-    status: "New Inquiry",
-    estimateValue: 12000,
-    createdAt: "2025-11-20T07:55:00Z",
-  },
-];
-
 const statusColor: Record<Project["status"], string> = {
-  Accepted: "#14b8a6",
-  "Pending Signature": "#f59e0b",
-  Drafting: "#a78bfa",
-  "New Inquiry": "#3b82f6",
+  ACCEPTED: "#14b8a6",
+  COMPLETED:"#3b82f6",
+  NEW:  "#f59e0b",
 };
 
 const statusOptions = [
-  { label: "Accepted", value: "Accepted" as const },
-  { label: "Pending Signature", value: "Pending Signature" as const },
-  { label: "Drafting", value: "Drafting" as const },
-  { label: "New Inquiry", value: "New Inquiry" as const },
+  { label: "Estimé", value: "NEW" as const },
+  { label: "Projet terminé ", value: "COMPLETED" as const },
+  { label: "Projet en cours", value: "ACCEPTED" as const },
 ];
 
-const columns: TableProps<Project>["columns"] = [
-  {
-    title: "Project ID",
-    dataIndex: "projectId",
-    key: "projectId",
-  },
-  {
-    title: "Client Name",
-    dataIndex: "clientName",
-    key: "clientName",
-  },
-  {
-    title: "Artisan",
-    dataIndex: "artisan",
-    key: "artisan",
-  },
-  {
-    title: "Status",
-    dataIndex: "status",
-    key: "status",
-    render: (value: Project["status"]) => (
-      <Tag color={statusColor[value]} style={{ color: "#fff" }}>
-        {value}
-      </Tag>
-    ),
-  },
-  {
-    title: "Estimate Value",
-    dataIndex: "estimateValue",
-    key: "estimateValue",
-    render: (value: number) => `$${value.toLocaleString()}`,
-  },
-  {
-    title: "Created At",
-    dataIndex: "createdAt",
-    key: "createdAt",
-    render: (value: string) => moment(value).format("DD MMM YYYY, HH:mm"),
-  },
-  {
-    title: "Action",
-    key: "action",
-    render: (_, record) => (
-      <Button type="link">
-        <Link to={`/project-management/${record.projectId}`}>
-          <FaEye size={20} />
-        </Link>
-      </Button>
-    ),
-  },
-];
+// Status Update Cell Component
+const StatusUpdateCell = ({ 
+  projectId, 
+  currentStatus 
+}: { 
+  projectId: string; 
+  currentStatus: "NEW" | "COMPLETED" | "ACCEPTED" 
+}) => {
+  const [updateProject, { isLoading }] = useUpdateProjectManagementMutation();
+  const bgColor = statusColor[currentStatus];
+
+  const handleStatusChange = async (newStatus: "NEW" | "COMPLETED" | "ACCEPTED") => {
+    try {
+      await updateProject({
+        id: projectId,
+        status: newStatus,
+      }).unwrap();
+      
+      message.success("Status updated successfully");
+    } catch (error) {
+      message.error("Failed to update status");
+    }
+  };
+
+  return (
+    <>
+      <style>{`
+        .status-select-${projectId} .ant-select-selector {
+          background-color: ${bgColor} !important;
+          color: #fff !important;
+          border: none !important;
+          box-shadow: none !important;
+          font-weight: 500;
+          padding: 4px 11px !important;
+        }
+        .status-select-${projectId} .ant-select-arrow {
+          color: #fff !important;
+        }
+        .status-select-${projectId}:hover .ant-select-selector,
+        .status-select-${projectId}.ant-select-focused .ant-select-selector,
+        .status-select-${projectId}.ant-select-open .ant-select-selector {
+          background-color: ${bgColor} !important;
+          border: none !important;
+          box-shadow: none !important;
+        }
+      `}</style>
+      <Select
+        className={`w-full status-select-${projectId}`}
+        value={currentStatus}
+        onChange={handleStatusChange}
+        loading={isLoading}
+        options={statusOptions}
+        popupMatchSelectWidth={false}
+      />
+    </>
+  );
+};
 
 const ProjectManagement = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState<Project["status"] | "All">(
-    "All"
-  );
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Get values from URL
+  const searchTerm = searchParams.get("searchTerm") || "";
+  const statusFilter = (searchParams.get("status") as Project["status"] | "All") || "All";
+  const page = Number(searchParams.get("page")) || 1;
+  const limit = Number(searchParams.get("limit")) || 10;
 
-  const filteredData = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
-    return dataSource.filter((item) => {
-      const matchesStatus =
-        statusFilter === "All" || item.status === statusFilter;
-      const haystack =
-        `${item.projectId} ${item.clientName} ${item.artisan}`.toLowerCase();
-      const matchesSearch = term === "" || haystack.includes(term);
-      return matchesStatus && matchesSearch;
+  // Update URL params helper
+  const updateParams = (updates: Record<string, string | number>) => {
+    const newParams = new URLSearchParams(searchParams);
+    
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === "" || value === "All") {
+        newParams.delete(key);
+      } else {
+        newParams.set(key, String(value));
+      }
     });
-  }, [searchTerm, statusFilter]);
+    
+    setSearchParams(newParams);
+  };
+
+  // Build query args for API
+  const queryArgs: any = {
+    page,
+    limit,
+  };
+  
+  if (statusFilter !== "All") {
+    queryArgs.status = statusFilter;
+  }
+  
+  if (searchTerm.trim()) {
+    queryArgs.searchTerm = searchTerm.trim();
+  }
+
+  const { data, isLoading, isFetching } = useProjectManagementQuery(queryArgs);
+
+  const columns: TableProps<Project>["columns"] = [
+    {
+      title: "Project Code",
+      dataIndex: "projectCode",
+      key: "projectCode",
+    },
+    {
+      title: "Client Name",
+      key: "clientName",
+      render: (_, record) => `${record.firstName} ${record.lastName}`,
+    },
+    {
+      title: "Artisan",
+      key: "artisan",
+      render: (_, record) =>
+        record.artisanId
+          ? `${record.artisanId.firstName} ${record.artisanId.lastName}`
+          : "—",
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      width: 200,
+      render: (value: Project["status"], record) => (
+        <StatusUpdateCell 
+          projectId={record._id} 
+          currentStatus={value} 
+        />
+      ),
+    },
+    {
+      title: "Total with VAT",
+      dataIndex: "totalWithVat",
+      key: "totalWithVat",
+      render: (value: number) => `€${value.toLocaleString()}`,
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "Created At",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (value: string) => moment(value).format("DD MMM YYYY, HH:mm"),
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Button type="link">
+          <Link to={`/project-management/${record._id}`}>
+            <FaEye size={20} />
+          </Link>
+        </Button>
+      ),
+    },
+  ];
 
   return (
     <div className="bg-white rounded-2xl p-4 shadow-sm">
@@ -176,12 +205,22 @@ const ProjectManagement = () => {
             placeholder="Search projects"
             className="w-[500px] py-3"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              updateParams({
+                searchTerm: e.target.value,
+                page: 1, // Reset to first page on search
+              });
+            }}
           />
           <Select
             className="w-56 h-12"
             value={statusFilter}
-            onChange={(v) => setStatusFilter(v as Project["status"] | "All")}
+            onChange={(v) => {
+              updateParams({
+                status: v as string,
+                page: 1, // Reset to first page on filter
+              });
+            }}
             options={[
               { label: "All Statuses", value: "All" },
               ...statusOptions,
@@ -189,6 +228,7 @@ const ProjectManagement = () => {
           />
         </div>
       </div>
+
       <ConfigProvider
         theme={{
           components: {
@@ -198,12 +238,22 @@ const ProjectManagement = () => {
           },
         }}
       >
-        <Table<Project>
-          rowKey="projectId"
-          dataSource={filteredData}
-          columns={columns}
-          pagination={{ pageSize: 10 }}
-        />
+        <Spin spinning={isLoading || isFetching}>
+          <Table<Project>
+            rowKey="_id"
+            dataSource={data?.data || []}
+            columns={columns}
+            pagination={{
+              current: page,
+              pageSize: limit,
+              total: data?.pagination?.total || 0,
+              onChange: (newPage) => {
+                updateParams({ page: newPage });
+              },
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+            }}
+          />
+        </Spin>
       </ConfigProvider>
     </div>
   );

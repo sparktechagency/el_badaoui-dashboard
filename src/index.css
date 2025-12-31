@@ -118,3 +118,89 @@
 .ant-switch-checked {
   background-color: #3f51b5 !important;
 }
+
+/* Hide Google Translate default UI elements completely */
+#google_translate_element {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+}
+
+.goog-te-banner-frame,
+.goog-te-balloon-frame,
+.goog-te-gadget,
+.goog-te-gadget-simple,
+.goog-te-gadget-icon,
+#google_translate_element > div,
+#google_translate_element > span,
+body > .goog-te-banner-frame,
+body > .skiptranslate {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
+
+body {
+  top: 0 !important;
+}
+
+/* Prevent Google Translate from adding top margin */
+.skiptranslate {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Hide any Google Translate iframe or container */
+iframe[title*="translate"],
+iframe[title*="Google"],
+.goog-te-menu-frame,
+.goog-te-menu-value {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* TimePicker - Disable hover selection, only allow click selection */
+.time-picker-popup .ant-picker-time-panel-column > li {
+  cursor: pointer;
+  pointer-events: auto !important;
+}
+
+.time-picker-popup .ant-picker-time-panel-column > li.ant-picker-time-panel-cell-selected {
+  background: #3f51b5 !important;
+  color: white !important;
+}
+
+.time-picker-popup .ant-picker-time-panel-column > li:not(.ant-picker-time-panel-cell-selected):hover {
+  background: rgba(63, 81, 181, 0.1) !important;
+}
+
+/* Prevent hover from updating input field - only allow click */
+.time-picker-popup .ant-picker-time-panel-column {
+  pointer-events: auto;
+}
+
+/* Ensure click events work properly */
+.time-picker-popup .ant-picker-time-panel-column > li {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Prevent input field from updating on hover */
+.time-picker-popup .ant-picker-input > input {
+  pointer-events: none;
+}
+
+.time-picker-popup .ant-picker-input > input:focus {
+  pointer-events: auto;
+}

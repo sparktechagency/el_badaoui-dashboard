@@ -1,18 +1,23 @@
 import { FaUsers } from "react-icons/fa6";
 import { BiBarChartAlt2 } from "react-icons/bi";
-import { RiCalendarTodoFill, RiClipboardFill } from "react-icons/ri";
+import { RiCalendarTodoFill } from "react-icons/ri";
 import salongoLogo from "../../../assets/salon-go-logo.png";
+import { useGeneralStatsQuery } from "@/redux/apiSlices/dashboardSlice";
+
 
 const GeneralStateSection = () => {
-  const generalState = {
-    data: {
-      totalActiveUsers: 1500,
-      newSignups: 120,
-      totalActiveVendors: 45,
-      totalCompletedOrders: 320,
-      totalServices: 75,
-    },
-  };
+  const { data  } = useGeneralStatsQuery(null);
+  console.log("data", data)
+
+  // const generalState = {
+  //   data: {
+  //     totalActiveUsers: 1500,
+  //     newSignups: 120,
+  //     totalActiveVendors: 45,
+  //     totalCompletedOrders: 320,
+  //     totalServices: 75,
+  //   },
+  // };
 
   const isLoading = false;
 
@@ -24,38 +29,38 @@ const GeneralStateSection = () => {
     );
   }
 
-  const state = generalState?.data;
+  // const state = generalState?.data;
 
   const cards = [
     {
-      title: "Total Estimate projects",
-      value: state?.totalActiveUsers ?? 0,
-      prefix: "+",
+      title: "Projets total estimé",
+      value: data?.data?.totalProjects ?? 0,
+      prefix: "",
       icon: BiBarChartAlt2,
       main: "#3f51b5",
       light: "#c7d2fe",
     },
     {
       title: "Active Projects",
-      value: state?.newSignups ?? 0,
-      prefix: "+",
+      value: data?.data?.activeProjects ?? 0,
+      prefix: "",
       icon: RiCalendarTodoFill,
       main: "#f59e0b",
       light: "#fde68a",
     },
     {
-      title: "New Clients (30D)",
-      value: state?.totalActiveVendors ?? 0,
-      prefix: "+ ",
+      title: "Total Users",
+      value: data?.data?.totalUsers ?? 0,
+      prefix: " ",
       icon: FaUsers,
       main: "#facc15",
       light: "#fef08a",
     },
     {
-      title: "Overdue Estimates",
-      value: state?.totalCompletedOrders ?? 0,
+      title: " Nouveaux clients (30 dernier jours)",
+      value: data?.data?.clientLast30Days ?? 0,
       prefix: "",
-      icon: RiClipboardFill,
+      icon: FaUsers,
       main: "#f43f5e",
       light: "#fecdd3",
     },
@@ -83,7 +88,7 @@ const GeneralStateSection = () => {
             key={c.title}
             className="relative bg-white rounded-2xl px-6 py-4 shadow-sm ring-1 ring-black/5 overflow-hidden"
           >
-            <div className="flex items-start justify-between">
+            <div className="flex items-center justify-between">
               <span className="text-[13px] font-medium text-gray-600">{c.title}</span>
               <span
                 className="rounded-md p-2"
@@ -93,7 +98,7 @@ const GeneralStateSection = () => {
               </span>
             </div>
             <div className="mt-2">
-              <span className="text-2xl font-semibold" style={{ color: c.main }}>
+              <span className="text-2xl font-semibold text-center" style={{ color: c.main }}>
                 {number}
               </span>
             </div>
