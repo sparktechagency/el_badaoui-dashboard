@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Card,
   TimePicker,
@@ -8,7 +8,9 @@ import {
   message,
   Spin,
   Alert,
+  ConfigProvider,
 } from "antd";
+import enUS from "antd/locale/en_US";
 import moment from "moment-timezone";
 
 import {
@@ -28,12 +30,57 @@ const AvailableTime = () => {
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
   const [userTimezone, setUserTimezone] = useState("");
+  const [isStartPickerOpen, setIsStartPickerOpen] = useState(false);
+  const [isEndPickerOpen, setIsEndPickerOpen] = useState(false);
+  const startTimeRef = useRef<moment.Moment | null>(null);
+  const endTimeRef = useRef<moment.Moment | null>(null);
 
   // Round time to nearest 15-minute interval (00, 15, 30, 45)
   const roundToNearestQuarter = (time: moment.Moment): moment.Moment => {
     const minutes = time.minute();
     const roundedMinutes = Math.round(minutes / 15) * 15;
     return time.clone().minute(roundedMinutes).second(0).millisecond(0);
+  };
+
+  // Handle time picker change - this fires on hover, we completely ignore it
+  // to prevent input field from updating on hover
+  const handleStartTimePickerChange = () => {
+    // Intentionally empty - we don't want to update on hover
+    // Only onSelect (click) will update the value
+  };
+
+  const handleEndTimePickerChange = () => {
+    // Intentionally empty - we don't want to update on hover
+    // Only onSelect (click) will update the value
+  };
+
+  // Handle actual selection - only called on click
+  // This is the only place where we update the actual value
+  const handleStartTimeSelect = (time: any) => {
+    if (time) {
+      const momentTime = moment(time);
+      const rounded = roundToNearestQuarter(momentTime);
+      startTimeRef.current = rounded;
+      setStartTime(rounded as any);
+    }
+  };
+
+  const handleEndTimeSelect = (time: any) => {
+    if (time) {
+      const momentTime = moment(time);
+      const rounded = roundToNearestQuarter(momentTime);
+      endTimeRef.current = rounded;
+      setEndTime(rounded as any);
+    }
+  };
+
+  // Handle picker open/close
+  const handleStartPickerOpenChange = (open: boolean) => {
+    setIsStartPickerOpen(open);
+  };
+
+  const handleEndPickerOpenChange = (open: boolean) => {
+    setIsEndPickerOpen(open);
   };
 
   // Detect user's timezone
@@ -198,26 +245,38 @@ const AvailableTime = () => {
             >
               <div>
                 <Text strong>Start Time</Text>
-                <TimePicker
-                  value={startTime}
-                  onChange={(t) => setStartTime(t as any)}
-                  format="HH:mm"
-                  size="large"
-                  style={{ width: "100%" }}
-                  minuteStep={15}
-                />
+                <ConfigProvider locale={enUS}>
+                  <TimePicker
+                    value={startTime}
+                    onChange={handleStartTimePickerChange}
+                    onSelect={handleStartTimeSelect}
+                    open={isStartPickerOpen}
+                    onOpenChange={handleStartPickerOpenChange}
+                    format="HH:mm"
+                    size="large"
+                    style={{ width: "100%" }}
+                    minuteStep={15}
+                    popupClassName="time-picker-popup"
+                  />
+                </ConfigProvider>
               </div>
 
               <div>
                 <Text strong>End Time</Text>
-                <TimePicker
-                  value={endTime}
-                  onChange={(t) => setEndTime(t as any)}
-                  format="HH:mm"
-                  size="large"
-                  style={{ width: "100%" }}
-                  minuteStep={15}
-                />
+                <ConfigProvider locale={enUS}>
+                  <TimePicker
+                    value={endTime}
+                    onChange={handleEndTimePickerChange}
+                    onSelect={handleEndTimeSelect}
+                    open={isEndPickerOpen}
+                    onOpenChange={handleEndPickerOpenChange}
+                    format="HH:mm"
+                    size="large"
+                    style={{ width: "100%" }}
+                    minuteStep={15}
+                    popupClassName="time-picker-popup"
+                  />
+                </ConfigProvider>
               </div>
             </div>
 
