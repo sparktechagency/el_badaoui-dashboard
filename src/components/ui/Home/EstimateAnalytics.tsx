@@ -40,7 +40,7 @@ const EstimateAnalytics = () => {
       className="px-5 py-3 bg-white rounded-2xl"
     >
       <div className="flex justify-between items-center">
-        <h4 className="mb-5 mt-4 text-xl font-semibold">Estimate Analytics</h4>
+        <h4 className="mb-5 mt-4 text-xl font-semibold">Graphique des estimations faites</h4>
 
         <select
           className="w-32 p-2 border border-gray-300 rounded-md"
