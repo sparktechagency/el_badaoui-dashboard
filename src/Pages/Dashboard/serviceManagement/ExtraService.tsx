@@ -321,7 +321,8 @@ const AddExtraServiceModal = ({ open, onClose, categoryId, service }: Props) => 
                         className="w-full h-[45px]"
                         options={[
                           { label: "Fixed", value: "FIXED" },
-                        //   { label: "Percentage", value: "PERCENTAGE" },
+                          { label: "Percentage", value: "PERCENTAGE" },
+                          { label: "Multiplier", value: "MULTIPLIER" },
                         ]}
                       />
                     </div>
