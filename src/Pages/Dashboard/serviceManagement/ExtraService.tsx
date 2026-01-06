@@ -83,24 +83,26 @@ const AddExtraServiceModal = ({ open, onClose, categoryId, service }: Props) => 
     });
   };
 
-  const handleRemoveTier = (tierIndex: number) => {
-    setPricingConfig({
-      ...pricingConfig,
-      tiers: pricingConfig.tiers?.filter((_, idx) => idx !== tierIndex),
-    });
-  };
+  // const handleRemoveTier = (tierIndex: number) => {
+  //   setPricingConfig({
+  //     ...pricingConfig,
+  //     tiers: pricingConfig.tiers?.filter((_, idx) => idx !== tierIndex),
+  //   });
+  // };
 
-  const handleUpdateTier = (
-    tierIndex: number,
-    field: "max" | "pricePerUnit",
-    value: number | null
-  ) => {
-    if (pricingConfig.tiers) {
-      const newTiers = [...pricingConfig.tiers];
-      newTiers[tierIndex][field] = value;
-      setPricingConfig({ ...pricingConfig, tiers: newTiers });
-    }
-  };
+const handleUpdateTier = (
+  tierIndex: number,
+  field: "max" | "pricePerUnit",
+  value: number
+) => {
+  if (!pricingConfig.tiers) return;
+
+  const newTiers = [...pricingConfig.tiers];
+  newTiers[tierIndex][field] = value;
+
+  setPricingConfig({ ...pricingConfig, tiers: newTiers });
+};
+
 
 
   useEffect(() => {
