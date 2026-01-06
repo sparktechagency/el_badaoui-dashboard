@@ -14,7 +14,7 @@ import {
 } from "antd";
 import type { TableProps, UploadFile } from "antd";
 import { FiEdit, FiEye } from "react-icons/fi";
-import { FaPlus } from "react-icons/fa6";
+// import { FaPlus } from "react-icons/fa6";
 import {
   useCreateCategoryMutation,
   // useDeleteCategoryMutation,
@@ -186,12 +186,12 @@ const Categories = () => {
   //   setAddServiceModalOpen(true);
   // };
 
-  const onAddClick = () => {
-    setEditingId(null);
-    setName("");
-    setImageFile(null);
-    setOpen(true);
-  };
+  // const onAddClick = () => {
+  //   setEditingId(null);
+  //   setName("");
+  //   setImageFile(null);
+  //   setOpen(true);
+  // };
 
   const onSubmit = async () => {
     if (!name.trim()) {
@@ -251,14 +251,14 @@ const Categories = () => {
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold text-[#210630]">{header}</h3>
-          <Button
+          {/* <Button
             // type="primary"
             onClick={onAddClick}
             disabled={isLoadingCategories}
             className="py-[22px] bg-[#3f51b5] text-white"
           >
             <FaPlus /> Add Category
-          </Button>
+          </Button> */}
         </div>
 
         {isLoadingCategories ? (

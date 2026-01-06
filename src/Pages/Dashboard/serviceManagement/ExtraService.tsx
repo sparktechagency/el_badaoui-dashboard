@@ -309,6 +309,7 @@ const AddExtraServiceModal = ({ open, onClose, categoryId, service }: Props) => 
                       { label: "Flat Rate", value: "FLAT" },
                       { label: "Tiered Pricing", value: "TIERED" },
                     ]}
+                    disabled={Boolean(service)}
                   />
                 </div>
 
@@ -384,7 +385,7 @@ const AddExtraServiceModal = ({ open, onClose, categoryId, service }: Props) => 
                               className="w-full h-[40px]"
                             />
                           </div>
-                          <div className="flex justify-end pt-5">
+                          {/* <div className="flex justify-end pt-5">
                             {pricingConfig?.tiers &&
                               pricingConfig.tiers.length > 1 && (
                                 <Button
@@ -398,7 +399,7 @@ const AddExtraServiceModal = ({ open, onClose, categoryId, service }: Props) => 
                                   className="h-[30px]"
                                 />
                               )}
-                          </div>
+                          </div> */}
                         </div>
                       ))}
                     </div>
@@ -476,7 +477,9 @@ const AddExtraServiceModal = ({ open, onClose, categoryId, service }: Props) => 
                                       uid: `${index}`,
                                       name: "image",
                                       status: "done",
-                                      url: option.optionImage,
+                                      url: option.optionImage.startsWith("http")
+                                        ? option.optionImage
+                                        : `${import.meta.env.VITE_API_BASE_URL || ""}${option.optionImage}`,
                                     } as UploadFile,
                                   ]
                                 : []
