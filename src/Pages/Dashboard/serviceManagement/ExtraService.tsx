@@ -93,12 +93,12 @@ const AddExtraServiceModal = ({ open, onClose, categoryId, service }: Props) => 
 const handleUpdateTier = (
   tierIndex: number,
   field: "max" | "pricePerUnit",
-  value: number
+  value: number | null
 ) => {
   if (!pricingConfig.tiers) return;
 
   const newTiers = [...pricingConfig.tiers];
-  newTiers[tierIndex][field] = value;
+  newTiers[tierIndex][field] = value as any;
 
   setPricingConfig({ ...pricingConfig, tiers: newTiers });
 };
@@ -381,7 +381,7 @@ const handleUpdateTier = (
                                 handleUpdateTier(
                                   tierIndex,
                                   "pricePerUnit",
-                                  value || 0
+                                  value
                                 )
                               }
                               className="w-full h-[40px]"
