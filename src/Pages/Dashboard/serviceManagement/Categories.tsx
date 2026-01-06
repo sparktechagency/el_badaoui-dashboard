@@ -13,11 +13,11 @@ import {
   Tooltip,
 } from "antd";
 import type { TableProps, UploadFile } from "antd";
-import { FiEdit, FiTrash2, FiEye, FiPlus } from "react-icons/fi";
-import { FaPlus } from "react-icons/fa6";
+import { FiEdit, FiEye } from "react-icons/fi";
+// import { FaPlus } from "react-icons/fa6";
 import {
   useCreateCategoryMutation,
-  useDeleteCategoryMutation,
+  // useDeleteCategoryMutation,
   useGetAllCategoriesQuery,
   useUpdateCategoryMutation,
 } from "@/redux/apiSlices/categoryApi";
@@ -51,8 +51,8 @@ const Categories = () => {
     useCreateCategoryMutation();
   const [updateCategory, { isLoading: isUpdating }] =
     useUpdateCategoryMutation();
-  const [deleteCategory, { isLoading: isDeleting }] =
-    useDeleteCategoryMutation();
+  // const [deleteCategory, { isLoading: isDeleting }] =
+  //   useDeleteCategoryMutation();
   console.log(categoryData);
 
   const categories = categoryData?.data || [];
@@ -116,7 +116,7 @@ const Categories = () => {
             </Button>
           </Tooltip>
 
-          <Tooltip title="Delete Category">
+          {/* <Tooltip title="Delete Category">
             <Button
               danger
               size="small"
@@ -125,7 +125,7 @@ const Categories = () => {
             >
               <FiTrash2 />
             </Button>
-          </Tooltip>
+          </Tooltip> */}
 
           <Tooltip title="View Extra Services">
             <Button
@@ -137,7 +137,7 @@ const Categories = () => {
             </Button>
           </Tooltip>
 
-          <Tooltip title="Add Extra Service">
+          {/* <Tooltip title="Add Extra Service">
             <Button
               // type="primary"
               size="small"
@@ -145,7 +145,7 @@ const Categories = () => {
             >
               <FiPlus />
             </Button>
-          </Tooltip>
+          </Tooltip> */}
         </Space>
       ),
     },
@@ -158,40 +158,40 @@ const Categories = () => {
     setOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    Modal.confirm({
-      title: "Delete Category",
-      content: "Are you sure you want to delete this category?",
-      okText: "Yes",
-      cancelText: "No",
-      okButtonProps: { danger: true },
-      onOk: async () => {
-        try {
-          await deleteCategory(id).unwrap();
-          message.success("Category deleted successfully!");
-        } catch (error) {
-          message.error("Failed to delete category");
-        }
-      },
-    });
-  };
+  // const handleDelete = (id: string) => {
+  //   Modal.confirm({
+  //     title: "Delete Category",
+  //     content: "Are you sure you want to delete this category?",
+  //     okText: "Yes",
+  //     cancelText: "No",
+  //     okButtonProps: { danger: true },
+  //     onOk: async () => {
+  //       try {
+  //         await deleteCategory(id).unwrap();
+  //         message.success("Category deleted successfully!");
+  //       } catch (error) {
+  //         message.error("Failed to delete category");
+  //       }
+  //     },
+  //   });
+  // };
 
   const handleViewServices = (categoryId: string) => {
     setSelectedCategoryId(categoryId);
     setViewServicesModalOpen(true);
   };
 
-  const handleAddService = (categoryId: string) => {
-    setSelectedCategoryId(categoryId);
-    setAddServiceModalOpen(true);
-  };
+  // const handleAddService = (categoryId: string) => {
+  //   setSelectedCategoryId(categoryId);
+  //   setAddServiceModalOpen(true);
+  // };
 
-  const onAddClick = () => {
-    setEditingId(null);
-    setName("");
-    setImageFile(null);
-    setOpen(true);
-  };
+  // const onAddClick = () => {
+  //   setEditingId(null);
+  //   setName("");
+  //   setImageFile(null);
+  //   setOpen(true);
+  // };
 
   const onSubmit = async () => {
     if (!name.trim()) {
@@ -251,14 +251,14 @@ const Categories = () => {
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold text-[#210630]">{header}</h3>
-          <Button
+          {/* <Button
             // type="primary"
             onClick={onAddClick}
             disabled={isLoadingCategories}
             className="py-[22px] bg-[#3f51b5] text-white"
           >
             <FaPlus /> Add Category
-          </Button>
+          </Button> */}
         </div>
 
         {isLoadingCategories ? (
@@ -273,7 +273,7 @@ const Categories = () => {
               rowKey="_id"
               dataSource={categories}
               columns={categoryColumns}
-              pagination={{ pageSize: 6 }}
+              pagination={{ pageSize: 15 }}
               size="small"
             />
           </ConfigProvider>
@@ -303,6 +303,7 @@ const Categories = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="h-[50px]"
+              disabled={Boolean(editingId)}
             />
           </div>
           <div>

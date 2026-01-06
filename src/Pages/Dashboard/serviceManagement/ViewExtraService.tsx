@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Modal, Table, Button, Space, Tag, Tooltip, message, Spin } from "antd";
+import { Modal, Table, Button, Space, Tag, Tooltip, Spin } from "antd";
 import type { TableProps } from "antd";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
-import { useGetExtraServicesQuery, useDeleteExtraServiceMutation } from "@/redux/apiSlices/categoryApi";
+import { FiEdit } from "react-icons/fi";
+import { useGetExtraServicesQuery } from "@/redux/apiSlices/categoryApi";
 import AddExtraServiceModal from "./ExtraService";
 // import EditExtraServiceModal from "./EditExtraServiceModal";
 
@@ -35,7 +35,7 @@ const ViewExtraServices = ({ open, onClose, categoryId }: Props) => {
   const { data: servicesData, isLoading } = useGetExtraServicesQuery(categoryId, {
     skip: !categoryId
   });
-  const [deleteService, { isLoading: isDeleting }] = useDeleteExtraServiceMutation();
+  // const [deleteService, { isLoading: isDeleting }] = useDeleteExtraServiceMutation();
 
   const services = servicesData?.data || [];
 
@@ -44,23 +44,23 @@ const ViewExtraServices = ({ open, onClose, categoryId }: Props) => {
     setEditModalOpen(true);
   };
 
-  const handleDelete = (id: string) => {
-    Modal.confirm({
-      title: "Delete Extra Service",
-      content: "Are you sure you want to delete this extra service?",
-      okText: "Yes",
-      cancelText: "No",
-      okButtonProps: { danger: true },
-      onOk: async () => {
-        try {
-          await deleteService(id).unwrap();
-          message.success("Extra service deleted successfully!");
-        } catch (error) {
-          message.error("Failed to delete extra service");
-        }
-      },
-    });
-  };
+  // const handleDelete = (id: string) => {
+  //   Modal.confirm({
+  //     title: "Delete Extra Service",
+  //     content: "Are you sure you want to delete this extra service?",
+  //     okText: "Yes",
+  //     cancelText: "No",
+  //     okButtonProps: { danger: true },
+  //     onOk: async () => {
+  //       try {
+  //         await deleteService(id).unwrap();
+  //         message.success("Extra service deleted successfully!");
+  //       } catch (error) {
+  //         message.error("Failed to delete extra service");
+  //       }
+  //     },
+  //   });
+  // };
 
   const columns: TableProps<ExtraService>["columns"] = [
     {
@@ -107,7 +107,7 @@ const ViewExtraServices = ({ open, onClose, categoryId }: Props) => {
               onClick={() => handleEdit(record)}
             />
           </Tooltip>
-          <Tooltip title="Delete Service">
+          {/* <Tooltip title="Delete Service">
             <Button
               danger
               size="small"
@@ -115,7 +115,7 @@ const ViewExtraServices = ({ open, onClose, categoryId }: Props) => {
               onClick={() => handleDelete(record._id)}
               loading={isDeleting}
             />
-          </Tooltip>
+          </Tooltip> */}
         </Space>
       ),
     },
@@ -153,7 +153,7 @@ const ViewExtraServices = ({ open, onClose, categoryId }: Props) => {
         key: "priceModifierValue",
         render: (value: number, opt: Option) => (
           <span>
-            {value} {opt.priceModifierType === "PERCENTAGE" ? "%" : "$"}
+            {value} {opt.priceModifierType === "PERCENTAGE" ? "%" : "€"}
           </span>
         ),
       },

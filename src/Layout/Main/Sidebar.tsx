@@ -64,17 +64,17 @@ const Sidebar = () => {
             </Link>
           ),
         },
-        {
-          key: "/service-management/subcategories",
-          label: (
-            <Link
-              to="/service-management/subcategories"
-              className="text-white hover:text-white"
-            >
-              Subcategories
-            </Link>
-          ),
-        },
+        // {
+        //   key: "/service-management/subcategories",
+        //   label: (
+        //     <Link
+        //       to="/service-management/subcategories"
+        //       className="text-white hover:text-white"
+        //     >
+        //       Subcategories
+        //     </Link>
+        //   ),
+        // },
       ],
     },
 
