@@ -14,7 +14,7 @@ const baseQueryWithAuth: BaseQueryFn<
 > = async (args, api, extraOptions) => {
   const baseQuery = fetchBaseQuery({
     // baseUrl: "http://10.10.7.54:4000/api/v1",
-    baseUrl: "https://reflectively-scansorial-avril.ngrok-free.dev/api/v1",
+    baseUrl: "https://07gmv2x0-5000.inc1.devtunnels.ms/api/v1",
     prepareHeaders: (headers) => {
       const token =
         localStorage.getItem("authToken") ||
@@ -63,4 +63,4 @@ export const api = createApi({
 
 // Base image URL
 // export const imageUrl = "http://10.10.7.54:4000";
-export const imageUrl = "https://reflectively-scansorial-avril.ngrok-free.dev";
+export const imageUrl = "https://07gmv2x0-5000.inc1.devtunnels.ms";
