@@ -73,15 +73,15 @@ const AddExtraServiceModal = ({ open, onClose, categoryId, service }: Props) => 
     setPricingConfig({ type: "FLAT", pricePerUnit: price });
   };
 
-  const handleAddTier = () => {
-    setPricingConfig({
-      ...pricingConfig,
-      tiers: [
-        ...(pricingConfig.tiers || []),
-        { max: null, pricePerUnit: 0 },
-      ],
-    });
-  };
+  // const handleAddTier = () => {
+  //   setPricingConfig({
+  //     ...pricingConfig,
+  //     tiers: [
+  //       ...(pricingConfig.tiers || []),
+  //       { max: null, pricePerUnit: 0 },
+  //     ],
+  //   });
+  // };
 
   // const handleRemoveTier = (tierIndex: number) => {
   //   setPricingConfig({
@@ -97,8 +97,12 @@ const handleUpdateTier = (
 ) => {
   if (!pricingConfig.tiers) return;
 
-  const newTiers = [...pricingConfig.tiers];
-  newTiers[tierIndex][field] = value as any;
+  const newTiers = pricingConfig.tiers.map((tier, index) => {
+    if (index === tierIndex) {
+      return { ...tier, [field]: value };
+    }
+    return tier;
+  });
 
   setPricingConfig({ ...pricingConfig, tiers: newTiers });
 };
@@ -336,14 +340,14 @@ const handleUpdateTier = (
                       <label className="block text-xs font-medium">
                         Tiers *
                       </label>
-                      <Button
+                      {/* <Button
                         type="dashed"
                         size="small"
                         onClick={() => handleAddTier()}
                         className="h-[30px]"
                       >
                         + Add Tier
-                      </Button>
+                      </Button> */}
                     </div>
 
                     <div className="space-y-2">
